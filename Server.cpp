@@ -6,7 +6,7 @@
 /*   By: lde-mais <lde-mais@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/20 11:39:34 by lde-mais          #+#    #+#             */
-/*   Updated: 2024/04/20 12:45:43 by lde-mais         ###   ########.fr       */
+/*   Updated: 2024/04/20 12:51:57 by lde-mais         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,13 +30,13 @@ Server::Server(int port, std::string pswd) : _port(port), _name("IRC"), _passwor
 	for (size_t i = 0; i < _password.size(); i++)
 	{
 		if (_password[i] == 32)
-			std::cerr << "Invalid Password" << std::endl;
+			throw (std::runtime_error("Invalid Password"));
 	}
 	//on check ici si le mot de passe a les bon parametres genre un
 	//espace au milieu
 	_socket = socket(AF_INET, SOCK_STREAM, 0);
 	if (_socket == -1) {
-		throw ("Server socket error");
+		throw (std::runtime_error("Server socket error"));
 	}
 	
 	_address.sin_family = AF_INET;
@@ -46,12 +46,12 @@ Server::Server(int port, std::string pswd) : _port(port), _name("IRC"), _passwor
 	if (bind(_socket, (struct sockaddr *)&_address, _size) == -1)
 	{
 		close(_socket);
-		throw("Bind Error"); //faudra gerer les try and catch mieux
+		throw(std::runtime_error("Bind Error")); //faudra gerer les try and catch mieux
 	}
 	if (listen(_socket, 5) == -1) //5 = clients max donc faudra voir si on veut DEFINE
 	{
 		close(_socket);
-		throw("Listen error");
+		throw(std::runtime_error("Listen error"));
 	}
 	std::cout << _name << " server started on port : " << _port << std::endl;
 }
