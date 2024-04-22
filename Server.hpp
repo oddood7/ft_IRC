@@ -6,7 +6,7 @@
 /*   By: lde-mais <lde-mais@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/20 11:45:38 by lde-mais          #+#    #+#             */
-/*   Updated: 2024/04/20 12:32:49 by lde-mais         ###   ########.fr       */
+/*   Updated: 2024/04/22 16:00:43 by lde-mais         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 # define SERVER_HPP
 
 # include <iostream>
+# include <unistd.h>
 # include <fstream>
 # include <cstdlib>
 # include <cctype>
@@ -26,26 +27,30 @@
 # include <netinet/in.h>
 # include <stdexcept>
 
+# define MAX_CLIENTS 7
 class Server
 {
 	private :
 
 	int	_port;
 	int	_socket;
-	std::string _name;
-	std::string _password;
-	bool _stop;
+	//int	_channels;
+	// std::string _name;
+	// std::string _password;
+	//bool _stop;
 
 	sockaddr_in _address;
-	socklen_t _size;
 	Server();
 	
 	public :
 
-	Server(int port, std::string pswd);
+	Server(int port); //, std::string pswd);
 	~Server();
 
 	void	run();
+	// void    socketCloser();
+	// void	createClient();
+	// void	listenClient();
 };
 
 #endif

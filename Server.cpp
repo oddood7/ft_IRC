@@ -5,61 +5,54 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: lde-mais <lde-mais@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/04/20 11:39:34 by lde-mais          #+#    #+#             */
-/*   Updated: 2024/04/20 12:51:57 by lde-mais         ###   ########.fr       */
+/*   Created: 2024/04/22 15:56:58 by lde-mais          #+#    #+#             */
+/*   Updated: 2024/04/22 15:57:53 by lde-mais         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <unistd.h>
 #include "Server.hpp"
+Server::Server() {}
 
-Server::Server() {
-	return ;
-}
-
-Server::~Server() {
-	return ;
-}
-
-Server::Server(int port, std::string pswd) : _port(port), _name("IRC"), _password(pswd), _stop(false)
+Server::Server(int port) : _port(port)
 {
-	//on construit un objet server avec un nom un password un port et un bool
-	//pour pouvoir stop le serveur si besoin
-	//on gererait ensuite l'ajout de client et la creation d'une adresse?
-
-	for (size_t i = 0; i < _password.size(); i++)
-	{
-		if (_password[i] == 32)
-			throw (std::runtime_error("Invalid Password"));
-	}
-	//on check ici si le mot de passe a les bon parametres genre un
-	//espace au milieu
 	_socket = socket(AF_INET, SOCK_STREAM, 0);
 	if (_socket == -1) {
-		throw (std::runtime_error("Server socket error"));
+		throw std::runtime_error("Server socket error");
 	}
-	
+
 	_address.sin_family = AF_INET;
 	_address.sin_port = htons(_port);
 	_address.sin_addr.s_addr = htonl(INADDR_ANY);
 
-	if (bind(_socket, (struct sockaddr *)&_address, _size) == -1)
+	if (bind(_socket, (struct sockaddr *)&_address, sizeof(_address)) == -1)
 	{
 		close(_socket);
-		throw(std::runtime_error("Bind Error")); //faudra gerer les try and catch mieux
+		throw std::runtime_error("Bind error");
 	}
-	if (listen(_socket, 5) == -1) //5 = clients max donc faudra voir si on veut DEFINE
+
+	if (listen(_socket, 5) == -1)
 	{
 		close(_socket);
-		throw(std::runtime_error("Listen error"));
+		throw std::runtime_error("Listen error");
 	}
-	std::cout << _name << " server started on port : " << _port << std::endl;
 }
 
-// void  Server::run()
-// {
-//   while (_stop == false)
-//   {
-//     //etc
-//   }
-// }
+Server::~Server()
+{
+	close(_socket);
+}
+
+void Server::run()
+{
+	sockaddr_in client_addr;
+	socklen_t client_addr_size = sizeof(client_addr);
+	int client_socket = accept(_socket, (struct sockaddr *)&client_addr, &client_addr_size);
+	if (client_socket == -1)
+	{
+		std::cerr << "Failed to accept client connection" << std::endl;
+		return;
+	}
+	std::cout << "New client connected" << std::endl;
+
+	close(client_socket);
+}
