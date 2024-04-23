@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lde-mais <lde-mais@student.42.fr>          +#+  +:+       +#+        */
+/*   By: diavolo <diavolo@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/20 11:45:38 by lde-mais          #+#    #+#             */
-/*   Updated: 2024/04/22 16:00:43 by lde-mais         ###   ########.fr       */
+/*   Updated: 2024/04/23 16:43:13 by diavolo          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,7 @@
 # include <sstream>
 # include <poll.h>
 # include <netinet/in.h>
+#include <arpa/inet.h>
 # include <stdexcept>
 
 # define MAX_CLIENTS 7
@@ -33,13 +34,19 @@ class Server
 	private :
 
 	int	_port;
-	int	_socket;
+	int	_serverSocket;
+	int _clientSocket;
+	char _buff[1024];
+	int _bytesRead;
 	//int	_channels;
 	// std::string _name;
 	// std::string _password;
 	//bool _stop;
 
-	sockaddr_in _address;
+	sockaddr_in _serverAddr;
+	sockaddr_in _clientAddr;
+	socklen_t _clientAddrLen;
+	pollfd fds[1];
 	Server();
 	
 	public :

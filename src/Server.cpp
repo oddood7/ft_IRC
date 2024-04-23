@@ -6,7 +6,7 @@
 /*   By: diavolo <diavolo@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/22 15:56:58 by lde-mais          #+#    #+#             */
-/*   Updated: 2024/04/23 14:47:29 by diavolo          ###   ########.fr       */
+/*   Updated: 2024/04/23 16:49:55 by diavolo          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,44 +15,67 @@ Server::Server() {}
 
 Server::Server(int port) : _port(port)
 {
-	_socket = socket(AF_INET, SOCK_STREAM, 0);
-	if (_socket == -1) {
-		throw std::runtime_error("Server socket error");
-	}
-
-	_address.sin_family = AF_INET;
-	_address.sin_port = htons(_port);
-	_address.sin_addr.s_addr = htonl(INADDR_ANY);
-
-	if (bind(_socket, (struct sockaddr *)&_address, sizeof(_address)) == -1)
-	{
-		close(_socket);
-		throw std::runtime_error("Bind error");
-	}
-
-	if (listen(_socket, 5) == -1)
-	{
-		close(_socket);
-		throw std::runtime_error("Listen error");
-	}
+	_serverSocket = socket(AF_INET, SOCK_STREAM, 0);
+	if (_serverSocket == -1)
+		throw std::invalid_argument("socket creation failed");
 }
 
 Server::~Server()
 {
-	close(_socket);
+	close(_serverSocket);
+	close(_clientSocket);
 }
 
 void Server::run()
 {
-	sockaddr_in client_addr;
-	socklen_t client_addr_size = sizeof(client_addr);
-	int client_socket = accept(_socket, (struct sockaddr *)&client_addr, &client_addr_size);
-	if (client_socket == -1)
-	{
-		std::cerr << "Failed to accept client connection" << std::endl;
-		return;
-	}
-	std::cout << "New client connected" << std::endl;
+	memset(&_serverAddr, 0, sizeof(_serverAddr));
+	_serverAddr.sin_family = AF_INET;
+	_serverAddr.sin_port = htons(_port);
+	_serverAddr.sin_addr.s_addr = htonl(INADDR_ANY);
+	
+	if (bind(_serverSocket, (sockaddr*)&_serverAddr, sizeof(_serverAddr)) == -1)
+		throw std::logic_error("bind error");
+	if (listen(_serverSocket, 10) == -1)
+		throw std::logic_error("listen error");
+	
+	std::cout << "waiting for connexion on the port " << _port << std::endl;
+	
+	fds[0].fd = _serverSocket;
+	fds[0].events = POLLIN;
 
-	close(client_socket);
+	while (true){
+		int ret = poll(fds, 1, -1);
+		if (ret == -1)
+			throw std::logic_error("Poll failed");
+		if (ret > 0)
+		{
+			if (fds[0].revents & POLLIN){
+				
+				_clientAddrLen = sizeof(_clientAddr);
+				_clientSocket = accept(_serverSocket, (sockaddr *)&_clientAddr, &_clientAddrLen);
+				if (_clientSocket == -1)
+					throw std::logic_error("Accept connexion error");
+				
+				
+				std::cout << "Connexion accepted since " << inet_ntoa(_clientAddr.sin_addr)
+				<< ":" << ntohs(_clientAddr.sin_port) << std::endl;
+
+				while (true){
+					_bytesRead = recv(_clientSocket, &_buff, 1024, MSG_DONTWAIT);
+					if (_bytesRead <= 0){
+						if (_bytesRead == 0)
+						{
+							std::cout << "Client disconnected" << std::endl;
+							close(_clientSocket);
+							break;
+						}
+						else
+							throw std::runtime_error("Error recv");	
+					}
+					_buff[_bytesRead] = '\0';
+					std::cout << "Message from the client: " << _buff << std::endl;
+				}
+			}
+		}
+	}
 }

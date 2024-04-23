@@ -6,7 +6,7 @@
 /*   By: diavolo <diavolo@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/20 11:30:33 by lde-mais          #+#    #+#             */
-/*   Updated: 2024/04/23 14:47:24 by diavolo          ###   ########.fr       */
+/*   Updated: 2024/04/23 15:07:16 by diavolo          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,9 @@ int	main(int ac, char **av)
 			Server server(std::atoi(av[1]));
 			server.run();
 		}
-		catch (std::exception &e) {}			
+		catch (std::exception &e) {
+			std::cerr << e.what() << std::endl;
+		}			
 	}
 	else
 		std::cerr << "Need 3 Args" << std::endl;
