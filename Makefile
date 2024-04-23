@@ -1,15 +1,25 @@
-NAME = ircserver
+NAME     = ircserver
+CC         = c++
+CFLAGS     = -Wall -Wextra -Werror -g3 -std=c++98
+SRCS     =  main.cpp Server.cpp
+OBJ_DIR = obj
+INCLUDES_FOLDER = includes/
+SRC_FOLDER = src/
 
-SRCS = main.cpp Server.cpp
-OBJS = $(SRCS:.cpp=.o)
+HEADERS       = $(wildcard $(INCLUDES_FOLDER)*.hpp)
 
-CXX = c++
-CXXFLAGS = -Wall -Wextra -Werror -std=c++98
+OBJS    = $(SRCS:%.cpp=$(OBJ_DIR)/%.o)
 
-all: $(NAME)
+all : $(NAME)
 
-$(NAME): $(OBJS)
-	$(CXX) $(CXXFLAGS) -o $(NAME) $(OBJS)
+$(NAME) : $(OBJS)
+	$(CC) $(CFLAGS) $^ -o $@
+
+$(OBJ_DIR)/%.o: $(SRC_FOLDER)%.cpp $(HEADERS) | $(OBJ_DIR)
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(OBJ_DIR):
+	mkdir -p $@
 
 clean:
 	rm -f $(OBJS)
@@ -19,4 +29,4 @@ fclean: clean
 
 re: fclean all
 
-.PHONY: all clean fclean re
+.PHONY:			all clean fclean re
