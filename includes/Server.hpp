@@ -6,7 +6,7 @@
 /*   By: diavolo <diavolo@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/20 11:45:38 by lde-mais          #+#    #+#             */
-/*   Updated: 2024/04/23 16:43:13 by diavolo          ###   ########.fr       */
+/*   Updated: 2024/04/29 13:13:58 by diavolo          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,29 +27,36 @@
 # include <netinet/in.h>
 #include <arpa/inet.h>
 # include <stdexcept>
+#include <map>
+#include <vector>
+#include "Client.hpp"
 
-# define MAX_CLIENTS 7
+class Client;
+
 class Server
 {
 	private :
 
 	int	_port;
 	int	_serverSocket;
-	int _clientSocket;
 	char _buff[1024];
 	int _bytesRead;
+	unsigned int _client_number;
 	//int	_channels;
 	// std::string _name;
 	// std::string _password;
 	//bool _stop;
 
 	sockaddr_in _serverAddr;
-	sockaddr_in _clientAddr;
-	socklen_t _clientAddrLen;
+	std::map<std::vector<std::string const>, class Client> map_client;
+	std::vector<std::string const> vec_client;
 	pollfd fds[1];
 	Server();
 	
 	public :
+	int getServerSocket(){
+		return this->_serverSocket;
+	};
 
 	Server(int port); //, std::string pswd);
 	~Server();

@@ -6,7 +6,7 @@
 /*   By: diavolo <diavolo@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/22 15:56:58 by lde-mais          #+#    #+#             */
-/*   Updated: 2024/04/23 16:49:55 by diavolo          ###   ########.fr       */
+/*   Updated: 2024/04/29 13:15:31 by diavolo          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,6 @@ Server::Server(int port) : _port(port)
 Server::~Server()
 {
 	close(_serverSocket);
-	close(_clientSocket);
 }
 
 void Server::run()
@@ -32,6 +31,7 @@ void Server::run()
 	_serverAddr.sin_family = AF_INET;
 	_serverAddr.sin_port = htons(_port);
 	_serverAddr.sin_addr.s_addr = htonl(INADDR_ANY);
+	_client_number = 0;
 	
 	if (bind(_serverSocket, (sockaddr*)&_serverAddr, sizeof(_serverAddr)) == -1)
 		throw std::logic_error("bind error");
@@ -47,26 +47,23 @@ void Server::run()
 		int ret = poll(fds, 1, -1);
 		if (ret == -1)
 			throw std::logic_error("Poll failed");
+		Client test(_serverSocket);
+		vec_client.insert(test.getIPAddress());
+		map_client[vec_client] = test;
 		if (ret > 0)
 		{
 			if (fds[0].revents & POLLIN){
 				
-				_clientAddrLen = sizeof(_clientAddr);
-				_clientSocket = accept(_serverSocket, (sockaddr *)&_clientAddr, &_clientAddrLen);
-				if (_clientSocket == -1)
-					throw std::logic_error("Accept connexion error");
 				
-				
-				std::cout << "Connexion accepted since " << inet_ntoa(_clientAddr.sin_addr)
-				<< ":" << ntohs(_clientAddr.sin_port) << std::endl;
+				std::cout << "Connexion accepted since " << inet_ntoa(test.getCLientAddr().sin_addr)
+				<< ":" << ntohs(test.getCLientAddr().sin_port) << std::endl;
 
 				while (true){
-					_bytesRead = recv(_clientSocket, &_buff, 1024, MSG_DONTWAIT);
+					_bytesRead = recv(map_client[test.getCLientAddr().sin_addr.s_addr].getCLientSocket(), &_buff, 1024, MSG_DONTWAIT);
 					if (_bytesRead <= 0){
 						if (_bytesRead == 0)
 						{
 							std::cout << "Client disconnected" << std::endl;
-							close(_clientSocket);
 							break;
 						}
 						else

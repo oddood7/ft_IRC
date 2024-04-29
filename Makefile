@@ -1,7 +1,7 @@
 NAME     = ircserver
 CC         = c++
 CFLAGS     = -Wall -Wextra -Werror -g3 -std=c++98 -lnsl
-SRCS     =  main.cpp Server.cpp
+SRCS     =  main.cpp Server.cpp Client.cpp
 OBJ_DIR = obj
 INCLUDES_FOLDER = includes/
 SRC_FOLDER = src/
