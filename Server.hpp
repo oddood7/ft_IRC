@@ -6,7 +6,7 @@
 /*   By: lde-mais <lde-mais@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/20 11:45:38 by lde-mais          #+#    #+#             */
-/*   Updated: 2024/04/22 16:00:43 by lde-mais         ###   ########.fr       */
+/*   Updated: 2024/05/07 15:09:06 by lde-mais         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,17 +27,20 @@
 # include <netinet/in.h>
 # include <stdexcept>
 
-# define MAX_CLIENTS 7
+# define MAX_CLIENTS 5
 class Server
 {
 	private :
 
 	int	_port;
 	int	_socket;
+	int	_pollRet;
+	int	_activeClients;
+	pollfd	_fd[MAX_CLIENTS + 1];
 	//int	_channels;
 	// std::string _name;
 	// std::string _password;
-	//bool _stop;
+	bool _stop;
 
 	sockaddr_in _address;
 	Server();
@@ -48,9 +51,8 @@ class Server
 	~Server();
 
 	void	run();
-	// void    socketCloser();
-	// void	createClient();
-	// void	listenClient();
+	void	acceptNewConnection();
+	void	processClientData(int _clientIndex);
 };
 
 #endif
