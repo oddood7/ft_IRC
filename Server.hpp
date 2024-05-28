@@ -5,8 +5,8 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: lde-mais <lde-mais@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/04/20 11:45:38 by lde-mais          #+#    #+#             */
-/*   Updated: 2024/05/07 15:09:06 by lde-mais         ###   ########.fr       */
+/*   Created: 2024/05/28 16:30:32 by lde-mais          #+#    #+#             */
+/*   Updated: 2024/05/28 16:30:54 by lde-mais         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,45 +14,38 @@
 # define SERVER_HPP
 
 # include <iostream>
-# include <unistd.h>
-# include <fstream>
-# include <cstdlib>
-# include <cctype>
-# include <cstring>
-# include <csignal>
-# include <sys/socket.h>
-# include <sys/types.h>
-# include <sstream>
-# include <poll.h>
-# include <netinet/in.h>
 # include <stdexcept>
+# include <cstring>
+# include <unistd.h>
+# include <netinet/in.h>
+# include <poll.h>
+# include <map>
+# include "User.hpp"
 
-# define MAX_CLIENTS 5
+# define MAX_USERS 5
+
 class Server
 {
-	private :
+    private:
+    
+	int _port;
+    int _socket;
+    int _activeUsers;
+    std::string _password;
+    bool _shutdown;
+    struct sockaddr_in _address;
+    struct pollfd _fds[MAX_USERS + 1];
+    std::map<int, User> UsersManage;
 
-	int	_port;
-	int	_socket;
-	int	_pollRet;
-	int	_activeClients;
-	pollfd	_fd[MAX_CLIENTS + 1];
-	//int	_channels;
-	// std::string _name;
-	// std::string _password;
-	bool _stop;
+    void acceptNewConnection();
+    void processUserData(int UserIndex);
+	bool authenticateUser(const std::string& password){ return password == _password; }
 
-	sockaddr_in _address;
-	Server();
-	
-	public :
-
-	Server(int port); //, std::string pswd);
-	~Server();
-
-	void	run();
-	void	acceptNewConnection();
-	void	processClientData(int _clientIndex);
+	public:
+    
+	Server(int port, const std::string& password);
+    ~Server();
+    void run();
 };
 
 #endif
