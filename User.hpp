@@ -51,6 +51,12 @@ private:
     bool isAuthenticated() const { return _authenticate; }
     void setPass(const std::string& pass) { _pass = pass; }
     const std::string& getPass() const { return _pass; }
+
+    bool operator<(const User& other) const {
+        // Comparer les attributs appropriés pour définir l'ordre
+        // Par exemple, comparer les noms d'utilisateur
+        return _userName < other._userName;
+    }
 };
 
 #endif

@@ -14,6 +14,7 @@
 # define SERVER_HPP
 
 # include <iostream>
+# include <cstdlib>
 # include <stdexcept>
 # include <cstring>
 # include <unistd.h>
@@ -21,6 +22,7 @@
 # include <poll.h>
 # include <map>
 # include "User.hpp"
+# include "Channel.hpp"
 
 # define MAX_USERS 5
 
