@@ -13,41 +13,49 @@
 #ifndef SERVER_HPP
 # define SERVER_HPP
 
-# include <iostream>
+# include "Channel.hpp"
+# include "User.hpp"
 # include <cstdlib>
-# include <stdexcept>
 # include <cstring>
-# include <unistd.h>
+# include <iostream>
+# include <map>
 # include <netinet/in.h>
 # include <poll.h>
-# include <map>
-# include "User.hpp"
-# include "Channel.hpp"
+# include <stdexcept>
+# include <unistd.h>
 
 # define MAX_USERS 5
 
 class Server
 {
-    private:
-    
+  private:
 	int _port;
-    int _socket;
-    int _activeUsers;
-    std::string _password;
-    bool _shutdown;
-    struct sockaddr_in _address;
-    struct pollfd _fds[MAX_USERS + 1];
-    std::map<int, User> UsersManage;
+	int _socket;
+	int _activeUsers;
+	std::string _password;
+	bool _shutdown;
+	struct sockaddr_in _address;
+	struct pollfd _fds[MAX_USERS + 1];
+	std::map<int, User> UsersManage;
 
-    void acceptNewConnection();
-    void processUserData(int UserIndex);
-	bool authenticateUser(const std::string& password){ return password == _password; }
+	void acceptNewConnection();
+	void processUserData(int UserIndex);
+	bool authenticateUser(const std::string &password)
+	{
+		return (password == _password);
+	}
+	void createChannel(User &user, const std::string &channelName);
+	void joinChannel(User &user, const std::string &channelName);
+	void partChannel(User &user, const std::string &channelName);
+	void login(User &user, const std::string &password);
+	typedef void (Server::*CommandFunction)(User &, const std::string &);
+	std::map<std::string, CommandFunction> _commandFunctions;
 
-	public:
-    
-	Server(int port, const std::string& password);
-    ~Server();
-    void run();
+  public:
+	Server(int port, const std::string &password);
+	~Server();
+	void run();
+	int getUserIndex(int fd);
 };
 
 #endif

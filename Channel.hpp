@@ -10,7 +10,7 @@ private:
     std::string _name;
     std::string _topic;
     int _mode;
-    int _userLimit;
+    int _userLimit; 
     bool _passwordProtected;
     std::set<User> _users;
     std::set<User> _operators;
