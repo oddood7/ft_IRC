@@ -6,7 +6,7 @@
 /*   By: lde-mais <lde-mais@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/27 16:08:05 by lde-mais          #+#    #+#             */
-/*   Updated: 2024/05/28 16:31:34 by lde-mais         ###   ########.fr       */
+/*   Updated: 2024/06/04 15:31:08 by lde-mais         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,6 +51,8 @@ private:
     bool isAuthenticated() const { return _authenticate; }
     void setPass(const std::string& pass) { _pass = pass; }
     const std::string& getPass() const { return _pass; }
+	void setNick(const std::string &nick) { _nickName = nick; }
+    std::string getNick() const { return _nickName; }
 
     bool operator<(const User& other) const {
         // Comparer les attributs appropriés pour définir l'ordre
