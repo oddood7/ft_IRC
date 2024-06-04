@@ -10,6 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+#include "Channel.hpp"
 #include "Server.hpp"
 
 Server::Server(int port, const std::string &password) : _port(port),
@@ -21,7 +22,7 @@ Server::Server(int port, const std::string &password) : _port(port),
 	_commandFunctions["/JOIN"] = &Server::joinChannel;
 	_commandFunctions["/PART"] = &Server::partChannel;
 	_commandFunctions["PASS"] = &Server::login;
-	// _commandFunctions["/NICK"] = &Server::setNick;
+	_commandFunctions["/NICK"] = &Server::setNick;
 	// _commandFunctions["/QUIT"] = &Server::quit;
 	// _commandFunctions["/PRIVMSG"] = &Server::sendMsg;
 	// _commandFunctions["/USER"] = &Server::setUser;
@@ -233,13 +234,6 @@ void Server::login(User &user, const std::string &password)
 		_activeUsers--;
 	}
 }
-void Server::createChannel(User &user, const std::string &channelName)
-{
-	(void)user;
-	(void)channelName;
-	std::cout << "into Create" << std::endl;
-	// Implémentation de la création d'un canal
-}
 
 void Server::joinChannel(User &user, const std::string &channelName)
 {
@@ -255,4 +249,50 @@ void Server::partChannel(User &user, const std::string &channelName)
 	(void)channelName;
 	std::cout << "into part" << std::endl;
 	// Implémentation du fait de quitter un canal
+}
+
+void Server::setNick(User &user, const std::string &nickname)
+{
+	if (nickname.empty())
+	{
+		// Envoyer un message d'erreur
+		send(user.getSocket(), "ERROR: Nickname cannot be empty.\n", 32, 0);
+		return ;
+	}
+	user.setNickName(nickname);
+	// Envoyer un message de confirmation
+	std::string message = "NICK set to " + nickname + "\n";
+	send(user.getSocket(), message.c_str(), message.length(), 0);
+}
+
+void Server::createChannel(User &user, const std::string &channelName)
+{
+	if (!user.isAuthenticated())
+	{
+		std::string errorMessage = "ERROR: You must be authenticated to create a channel.\n";
+		send(user.getSocket(), errorMessage.c_str(), errorMessage.length(), 0);
+		return ;
+	}
+	if (channelName.empty() || channelName[0] != '#')
+	{
+		std::string errorMessage = "ERROR: Invalid channel name. Channel names must start with '#'.\n";
+		send(user.getSocket(), errorMessage.c_str(), errorMessage.length(), 0);
+		return ;
+	}
+	// Vérifier si le canal existe déjà
+	if (_channels.find(channelName) != _channels.end())
+	{
+		std::string errorMessage = "ERROR: Channel " + channelName
+			+ " already exists.\n";
+		send(user.getSocket(), errorMessage.c_str(), errorMessage.length(), 0);
+		return ;
+	}
+	// Créer le nouveau canal
+	Channel newChannel(channelName);
+	newChannel.addUser(user);
+	newChannel.setOperator(user, true);
+	_channels[channelName] = newChannel;
+	std::string successMessage = "Channel " + channelName
+		+ " created successfully.\n";
+	send(user.getSocket(), successMessage.c_str(), successMessage.length(), 0);
 }

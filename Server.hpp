@@ -37,6 +37,7 @@ class Server
 	struct sockaddr_in _address;
 	struct pollfd _fds[MAX_USERS + 1];
 	std::map<int, User> UsersManage;
+	std::map<std::string, Channel> _channels;
 
 	void acceptNewConnection();
 	void processUserData(int UserIndex);
@@ -48,6 +49,7 @@ class Server
 	void joinChannel(User &user, const std::string &channelName);
 	void partChannel(User &user, const std::string &channelName);
 	void login(User &user, const std::string &password);
+	void setNick(User &user, const std::string &nickname);
 	typedef void (Server::*CommandFunction)(User &, const std::string &);
 	std::map<std::string, CommandFunction> _commandFunctions;
 
