@@ -6,7 +6,7 @@
 /*   By: lde-mais <lde-mais@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/28 16:30:32 by lde-mais          #+#    #+#             */
-/*   Updated: 2024/05/28 16:30:54 by lde-mais         ###   ########.fr       */
+/*   Updated: 2024/06/04 15:24:40 by lde-mais         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 
 # include "Channel.hpp"
 # include "User.hpp"
+# include "Utils.hpp"
 # include <cstdlib>
 # include <cstring>
 # include <iostream>
@@ -49,6 +50,7 @@ class Server
 	void joinChannel(User &user, const std::string &channelName);
 	void partChannel(User &user, const std::string &channelName);
 	void login(User &user, const std::string &password);
+	void setUser(User &user, const std::string &userInfo);
 	void setNick(User &user, const std::string &nickname);
 	typedef void (Server::*CommandFunction)(User &, const std::string &);
 	std::map<std::string, CommandFunction> _commandFunctions;

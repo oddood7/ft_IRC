@@ -6,7 +6,7 @@
 /*   By: lde-mais <lde-mais@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/28 16:30:15 by lde-mais          #+#    #+#             */
-/*   Updated: 2024/05/28 16:30:17 by lde-mais         ###   ########.fr       */
+/*   Updated: 2024/06/04 15:28:15 by lde-mais         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -209,7 +209,8 @@ void Server::login(User &user, const std::string &password)
 		// Authentifier l'utilisateur
 		user.setAuthenticated(true);
 		// Envoyer un message de bienvenue à l'utilisateur
-		std::string welcomeMessage = "Welcome to the IRC server!\n";
+		std::string welcomeMessage = RPL_WELCOME(std::to_string(user.getId()),
+			user.getNick());
 		send(user.getSocket(), welcomeMessage.c_str(), welcomeMessage.length(),
 			0);
 		std::cout << "User authenticated successfully" << std::endl;
