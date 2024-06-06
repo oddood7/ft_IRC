@@ -198,6 +198,12 @@ void Server::processUserData(int userIndex)
 		}
 	}
 }
+std::string int_to_string(int value)
+{
+	std::ostringstream oss;
+	oss << value;
+	return (oss.str());
+}
 
 void Server::login(User &user, const std::string &password)
 {
@@ -209,8 +215,9 @@ void Server::login(User &user, const std::string &password)
 		// Authentifier l'utilisateur
 		user.setAuthenticated(true);
 		// Envoyer un message de bienvenue à l'utilisateur
-		std::string welcomeMessage = RPL_WELCOME(std::to_string(user.getId()),
-			user.getNick());
+		std::ostringstream oss;
+		oss << RPL_WELCOME(int_to_string(user.getId()), user.getNick());
+		std::string welcomeMessage = oss.str();
 		send(user.getSocket(), welcomeMessage.c_str(), welcomeMessage.length(),
 			0);
 		std::cout << "User authenticated successfully" << std::endl;
@@ -292,7 +299,7 @@ void Server::createChannel(User &user, const std::string &channelName)
 	Channel newChannel(channelName);
 	newChannel.addUser(user);
 	newChannel.setOperator(user, true);
-	_channels[channelName] = newChannel;
+	_channels.insert(std::make_pair(channelName, newChannel));
 	std::string successMessage = "Channel " + channelName
 		+ " created successfully.\n";
 	send(user.getSocket(), successMessage.c_str(), successMessage.length(), 0);

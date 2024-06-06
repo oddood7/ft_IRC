@@ -50,6 +50,10 @@ class User
 	{
 		return (_id);
 	}
+	std::string getNick() const
+	{
+		return (_nickName);
+	}
 	void setId(int id)
 	{
 		_id = id;
