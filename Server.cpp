@@ -6,7 +6,7 @@
 /*   By: lde-mais <lde-mais@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/28 16:30:15 by lde-mais          #+#    #+#             */
-/*   Updated: 2024/06/04 15:28:15 by lde-mais         ###   ########.fr       */
+/*   Updated: 2024/06/06 15:41:50 by lde-mais         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -193,8 +193,8 @@ void Server::processUserData(int userIndex)
 		}
 		else
 		{
-			std::cout << "Unknown command" << std::endl;
-			// Commande inconnue, gérez l'erreur
+			std::string errorMessage = ERR_UNKNOWNCOMMAND(command);
+			send(_fds[userIndex].fd, errorMessage.c_str(), errorMessage.length(), 0);
 		}
 	}
 }
@@ -215,16 +215,15 @@ void Server::login(User &user, const std::string &password)
 		// Authentifier l'utilisateur
 		user.setAuthenticated(true);
 		// Envoyer un message de bienvenue à l'utilisateur
-		std::ostringstream oss;
-		oss << RPL_WELCOME(int_to_string(user.getId()), user.getNick());
-		std::string welcomeMessage = oss.str();
-		send(user.getSocket(), welcomeMessage.c_str(), welcomeMessage.length(),
-			0);
+		std::string welcomeMessage = RPL_WELCOME(user_id("localhost", user.getNick()), user.getNick());
+		send(user.getSocket(), welcomeMessage.c_str(), welcomeMessage.length(), 0);
 		std::cout << "User authenticated successfully" << std::endl;
 	}
 	else
 	{
 		// Le mot de passe est incorrect, déconnecter l'utilisateur
+		std::string errorMessage = ERR_PASSWDMISMATCH(user_id("localhost", user.getNick()));
+		send(user.getSocket(), errorMessage.c_str(), errorMessage.length(), 0);
 		std::cerr << "User failed to authenticate" << std::endl;
 		close(user.getSocket());
 		// Retirer l'utilisateur de la liste des utilisateurs connectés
@@ -245,16 +244,35 @@ void Server::login(User &user, const std::string &password)
 
 void Server::joinChannel(User &user, const std::string &channelName)
 {
-	(void)user;
-	(void)channelName;
+    if (channelName.empty()) {
+        std::string errorMessage = ERR_NEEDMOREPARAMS(user_id("localhost", user.getNick()), "JOIN");
+        send(user.getSocket(), errorMessage.c_str(), errorMessage.length(), 0);
+        return;
+    }
+    // Si l'utilisateur n'est pas authentifié
+    if (!user.isAuthenticated())
+    {
+        std::string errorMessage = ERR_NOTREGISTERED(user_id("localhost", user.getNick()));
+        send(user.getSocket(), errorMessage.c_str(), errorMessage.length(), 0);
+        return;
+    }
 	std::cout << "into join" << std::endl;
 	// Implémentation du fait de rejoindre un canal
 }
 
 void Server::partChannel(User &user, const std::string &channelName)
 {
-	(void)user;
-	(void)channelName;
+	if (channelName.empty()) {
+        std::string errorMessage = ERR_NEEDMOREPARAMS(user_id("localhost", user.getNick()), "PART");
+        send(user.getSocket(), errorMessage.c_str(), errorMessage.length(), 0);
+        return;
+    }
+	if (_channels.find(channelName) == _channels.end())
+    {
+        std::string errorMessage = ERR_NOSUCHCHANNEL(channelName);
+        send(user.getSocket(), errorMessage.c_str(), errorMessage.length(), 0);
+        return;
+    }
 	std::cout << "into part" << std::endl;
 	// Implémentation du fait de quitter un canal
 }
@@ -262,11 +280,11 @@ void Server::partChannel(User &user, const std::string &channelName)
 void Server::setNick(User &user, const std::string &nickname)
 {
 	if (nickname.empty())
-	{
-		// Envoyer un message d'erreur
-		send(user.getSocket(), "ERROR: Nickname cannot be empty.\n", 32, 0);
-		return ;
-	}
+    {
+        std::string errorMessage = ERR_NONICKNAMEGIVEN(user_id("localhost", user.getNick()));
+        send(user.getSocket(), errorMessage.c_str(), errorMessage.length(), 0);
+        return ;
+    }
 	user.setNickName(nickname);
 	// Envoyer un message de confirmation
 	std::string message = "NICK set to " + nickname + "\n";
@@ -276,17 +294,17 @@ void Server::setNick(User &user, const std::string &nickname)
 void Server::createChannel(User &user, const std::string &channelName)
 {
 	if (!user.isAuthenticated())
-	{
-		std::string errorMessage = "ERROR: You must be authenticated to create a channel.\n";
-		send(user.getSocket(), errorMessage.c_str(), errorMessage.length(), 0);
-		return ;
-	}
-	if (channelName.empty() || channelName[0] != '#')
-	{
-		std::string errorMessage = "ERROR: Invalid channel name. Channel names must start with '#'.\n";
-		send(user.getSocket(), errorMessage.c_str(), errorMessage.length(), 0);
-		return ;
-	}
+    {
+        std::string errorMessage = ERR_NOTREGISTERED(user_id("localhost", user.getNick()));
+        send(user.getSocket(), errorMessage.c_str(), errorMessage.length(), 0);
+        return ;
+    }
+    if (channelName.empty() || channelName[0] != '#')
+    {
+        std::string errorMessage = ERR_ERRONEUSNICKNAME(user_id("localhost", user.getNick()), channelName);
+        send(user.getSocket(), errorMessage.c_str(), errorMessage.length(), 0);
+        return ;
+    }
 	// Vérifier si le canal existe déjà
 	if (_channels.find(channelName) != _channels.end())
 	{
