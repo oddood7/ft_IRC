@@ -16,6 +16,7 @@
 # include "Channel.hpp"
 # include "User.hpp"
 # include "Utils.hpp"
+# include <csignal>
 # include <cstdlib>
 # include <cstring>
 # include <iostream>
@@ -52,6 +53,8 @@ class Server
 	void login(User &user, const std::string &password);
 	void setUser(User &user, const std::string &userInfo);
 	void setNick(User &user, const std::string &nickname);
+	void quit(User &user, const std::string &message);
+
 	typedef void (Server::*CommandFunction)(User &, const std::string &);
 	std::map<std::string, CommandFunction> _commandFunctions;
 

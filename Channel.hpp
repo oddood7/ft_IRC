@@ -11,7 +11,7 @@ class Channel
 	std::string _name;
 	std::string _topic;
 	int _mode;
-	int _userLimit;
+	size_t _userLimit;
 	bool _passwordProtected;
 	std::set<User> _users;
 	std::set<User> _operators;
@@ -33,7 +33,7 @@ class Channel
 	const std::set<User> &getOperators() const;
 	const std::string &getTopic() const;
 	int getMode() const;
-	int getUserLimit() const;
+	size_t getUserLimit() const;
 	bool isPasswordProtected() const;
 };
 

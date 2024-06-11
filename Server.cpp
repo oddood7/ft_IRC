@@ -23,7 +23,7 @@ Server::Server(int port, const std::string &password) : _port(port),
 	_commandFunctions["/PART"] = &Server::partChannel;
 	_commandFunctions["PASS"] = &Server::login;
 	_commandFunctions["/NICK"] = &Server::setNick;
-	// _commandFunctions["/QUIT"] = &Server::quit;
+	_commandFunctions["/QUIT"] = &Server::quit;
 	// _commandFunctions["/PRIVMSG"] = &Server::sendMsg;
 	// _commandFunctions["/USER"] = &Server::setUser;
 	// _commandFunctions["/OPER"] = &Server::becomeOper;
@@ -110,8 +110,10 @@ void Server::acceptNewConnection()
 	int			client_socket;
 
 	client_addr_size = sizeof(client_addr);
+	std::cout << _socket << std::endl;
 	client_socket = accept(_socket, (struct sockaddr *)&client_addr,
 		&client_addr_size);
+	std::cout << "ici" << client_socket << std::endl;
 	if (client_socket == -1)
 	{
 		std::cerr << "Failed to accept client connection" << std::endl;
@@ -194,7 +196,8 @@ void Server::processUserData(int userIndex)
 		else
 		{
 			std::string errorMessage = ERR_UNKNOWNCOMMAND(command);
-			send(_fds[userIndex].fd, errorMessage.c_str(), errorMessage.length(), 0);
+			send(_fds[userIndex].fd, errorMessage.c_str(),
+				errorMessage.length(), 0);
 		}
 	}
 }
@@ -215,14 +218,17 @@ void Server::login(User &user, const std::string &password)
 		// Authentifier l'utilisateur
 		user.setAuthenticated(true);
 		// Envoyer un message de bienvenue à l'utilisateur
-		std::string welcomeMessage = RPL_WELCOME(user_id("localhost", user.getNick()), user.getNick());
-		send(user.getSocket(), welcomeMessage.c_str(), welcomeMessage.length(), 0);
+		std::string welcomeMessage = RPL_WELCOME(user_id("localhost",
+				user.getNick()), user.getNick());
+		send(user.getSocket(), welcomeMessage.c_str(), welcomeMessage.length(),
+			0);
 		std::cout << "User authenticated successfully" << std::endl;
 	}
 	else
 	{
 		// Le mot de passe est incorrect, déconnecter l'utilisateur
-		std::string errorMessage = ERR_PASSWDMISMATCH(user_id("localhost", user.getNick()));
+		std::string errorMessage = ERR_PASSWDMISMATCH(user_id("localhost",
+				user.getNick()));
 		send(user.getSocket(), errorMessage.c_str(), errorMessage.length(), 0);
 		std::cerr << "User failed to authenticate" << std::endl;
 		close(user.getSocket());
@@ -244,47 +250,99 @@ void Server::login(User &user, const std::string &password)
 
 void Server::joinChannel(User &user, const std::string &channelName)
 {
-    if (channelName.empty()) {
-        std::string errorMessage = ERR_NEEDMOREPARAMS(user_id("localhost", user.getNick()), "JOIN");
-        send(user.getSocket(), errorMessage.c_str(), errorMessage.length(), 0);
-        return;
-    }
-    // Si l'utilisateur n'est pas authentifié
-    if (!user.isAuthenticated())
-    {
-        std::string errorMessage = ERR_NOTREGISTERED(user_id("localhost", user.getNick()));
-        send(user.getSocket(), errorMessage.c_str(), errorMessage.length(), 0);
-        return;
-    }
-	std::cout << "into join" << std::endl;
-	// Implémentation du fait de rejoindre un canal
+	if (!user.isAuthenticated())
+	{
+		std::string errorMessage = "ERROR: You must be authenticated to join a channel.\n";
+		send(user.getSocket(), errorMessage.c_str(), errorMessage.length(), 0);
+		return ;
+	}
+	if (channelName.empty() || channelName[0] != '#')
+	{
+		std::string errorMessage = "ERROR: Invalid channel name. Channel names must start with '#'.\n";
+		send(user.getSocket(), errorMessage.c_str(), errorMessage.length(), 0);
+		return ;
+	}
+	std::map<std::string, Channel>::iterator it = _channels.find(channelName);
+	if (it == _channels.end())
+	{
+		// Le canal n'existe pas, on le crée
+		createChannel(user, channelName);
+		it = _channels.find(channelName);
+		// Récupérer l'itérateur après la création du canal
+	}
+	if (it != _channels.end())
+	{
+		Channel &channel = it->second;
+		if (channel.getUserLimit() > 0
+			&& channel.getUsers().size() >= channel.getUserLimit())
+		{
+			std::string errorMessage = "ERROR: Channel " + channelName
+				+ " has reached its user limit.\n";
+			send(user.getSocket(), errorMessage.c_str(), errorMessage.length(),
+				0);
+			return ;
+		}
+		channel.addUser(user);
+		std::string successMessage = "Joined channel " + channelName + "\n";
+		send(user.getSocket(), successMessage.c_str(), successMessage.length(),
+			0);
+	}
+	else
+	{
+		std::string errorMessage = "ERROR: Failed to join channel "
+			+ channelName + "\n";
+		send(user.getSocket(), errorMessage.c_str(), errorMessage.length(), 0);
+	}
 }
 
 void Server::partChannel(User &user, const std::string &channelName)
 {
-	if (channelName.empty()) {
-        std::string errorMessage = ERR_NEEDMOREPARAMS(user_id("localhost", user.getNick()), "PART");
-        send(user.getSocket(), errorMessage.c_str(), errorMessage.length(), 0);
-        return;
-    }
-	if (_channels.find(channelName) == _channels.end())
-    {
-        std::string errorMessage = ERR_NOSUCHCHANNEL(channelName);
-        send(user.getSocket(), errorMessage.c_str(), errorMessage.length(), 0);
-        return;
-    }
-	std::cout << "into part" << std::endl;
-	// Implémentation du fait de quitter un canal
+	if (!user.isAuthenticated())
+	{
+		std::string errorMessage = "ERROR: You must be authenticated to leave a channel.\n";
+		send(user.getSocket(), errorMessage.c_str(), errorMessage.length(), 0);
+		return ;
+	}
+	if (channelName.empty() || channelName[0] != '#')
+	{
+		std::string errorMessage = "ERROR: Invalid channel name. Channel names must start with '#'.\n";
+		send(user.getSocket(), errorMessage.c_str(), errorMessage.length(), 0);
+		return ;
+	}
+	std::map<std::string, Channel>::iterator it = _channels.find(channelName);
+	if (it == _channels.end())
+	{
+		std::string errorMessage = "ERROR: Channel " + channelName
+			+ " does not exist.\n";
+		send(user.getSocket(), errorMessage.c_str(), errorMessage.length(), 0);
+		return ;
+	}
+	Channel &channel = it->second;
+	if (channel.getUsers().find(user) == channel.getUsers().end())
+	{
+		std::string errorMessage = "ERROR: You are not a member of channel "
+			+ channelName + ".\n";
+		send(user.getSocket(), errorMessage.c_str(), errorMessage.length(), 0);
+		return ;
+	}
+	channel.removeUser(user);
+	std::string successMessage = "Left channel " + channelName + "\n";
+	send(user.getSocket(), successMessage.c_str(), successMessage.length(), 0);
+	if (channel.getUsers().empty())
+	{
+		_channels.erase(it);
+	}
 }
 
 void Server::setNick(User &user, const std::string &nickname)
 {
 	if (nickname.empty())
-    {
-        std::string errorMessage = ERR_NONICKNAMEGIVEN(user_id("localhost", user.getNick()));
-        send(user.getSocket(), errorMessage.c_str(), errorMessage.length(), 0);
-        return ;
-    }
+	{
+		std::string errorMessage = ERR_NONICKNAMEGIVEN(user_id("localhost",
+				user.getNick()));
+		send(user.getSocket(), errorMessage.c_str(), errorMessage.length(), 0);
+		return ;
+	}
 	user.setNickName(nickname);
 	// Envoyer un message de confirmation
 	std::string message = "NICK set to " + nickname + "\n";
@@ -294,17 +352,19 @@ void Server::setNick(User &user, const std::string &nickname)
 void Server::createChannel(User &user, const std::string &channelName)
 {
 	if (!user.isAuthenticated())
-    {
-        std::string errorMessage = ERR_NOTREGISTERED(user_id("localhost", user.getNick()));
-        send(user.getSocket(), errorMessage.c_str(), errorMessage.length(), 0);
-        return ;
-    }
-    if (channelName.empty() || channelName[0] != '#')
-    {
-        std::string errorMessage = ERR_ERRONEUSNICKNAME(user_id("localhost", user.getNick()), channelName);
-        send(user.getSocket(), errorMessage.c_str(), errorMessage.length(), 0);
-        return ;
-    }
+	{
+		std::string errorMessage = ERR_NOTREGISTERED(user_id("localhost",
+				user.getNick()));
+		send(user.getSocket(), errorMessage.c_str(), errorMessage.length(), 0);
+		return ;
+	}
+	if (channelName.empty() || channelName[0] != '#')
+	{
+		std::string errorMessage = ERR_ERRONEUSNICKNAME(user_id("localhost",
+				user.getNick()), channelName);
+		send(user.getSocket(), errorMessage.c_str(), errorMessage.length(), 0);
+		return ;
+	}
 	// Vérifier si le canal existe déjà
 	if (_channels.find(channelName) != _channels.end())
 	{
@@ -321,4 +381,63 @@ void Server::createChannel(User &user, const std::string &channelName)
 	std::string successMessage = "Channel " + channelName
 		+ " created successfully.\n";
 	send(user.getSocket(), successMessage.c_str(), successMessage.length(), 0);
+}
+
+void Server::quit(User &user, const std::string &message)
+{
+	if (!user.isAuthenticated())
+	{
+		std::cout << "ici 1" << std::endl;
+		std::string errorMessage = ERR_NOTREGISTERED(user_id("localhost",
+				user.getNick()));
+		send(user.getSocket(), errorMessage.c_str(), errorMessage.length(), 0);
+		return ;
+	}
+
+	// Envoyer un message de notification aux autres utilisateurs des canaux partagés
+	std::set<std::string> channels = user.getChannels();
+	for (std::set<std::string>::iterator it = channels.begin(); it != channels.end(); ++it)
+	{
+		std::string channel = *it;
+		std::map<std::string,
+			Channel>::iterator channelIt = _channels.find(channel);
+		if (channelIt != _channels.end())
+		{
+			Channel &currentChannel = channelIt->second;
+			std::set<User> users = currentChannel.getUsers();
+			for (std::set<User>::iterator userIt = users.begin(); userIt != users.end(); ++userIt)
+			{
+				if (*userIt != user)
+				{
+					std::string quitMessage = RPL_QUIT(user_id("localhost",
+							user.getNick()), message);
+					send(userIt->getSocket(), quitMessage.c_str(),
+						quitMessage.length(), 0);
+				}
+			}
+			currentChannel.removeUser(user);
+		}
+	}
+
+	// Envoyer un message de confirmation au client qui a initié la commande
+	std::string confirmMessage = "You have been disconnected from the server.\n";
+	send(user.getSocket(), confirmMessage.c_str(), confirmMessage.length(), 0);
+
+	// Fermer la connexion avec le client
+	close(user.getSocket());
+
+	// Retirer l'utilisateur de la liste des utilisateurs connectés
+	std::map<int, User>::iterator it = UsersManage.find(user.getSocket());
+	if (it != UsersManage.end())
+	{
+		UsersManage.erase(it);
+	}
+
+	// Décaler les descripteurs de fichiers pour maintenir la continuité
+	int userIndex = getUserIndex(user.getSocket());
+	for (int i = userIndex; i < _activeUsers; ++i)
+	{
+		_fds[i] = _fds[i + 1];
+	}
+	_activeUsers--;
 }

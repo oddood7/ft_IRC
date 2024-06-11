@@ -14,6 +14,7 @@
 # define USER_HPP
 
 # include <netinet/in.h>
+# include <set>
 # include <sstream>
 # include <string>
 # include <vector>
@@ -34,6 +35,7 @@ class User
 	// bool _irssi;
 	bool _authenticate;
 	bool _dc;
+	std::set<std::string> _channels;
 
   public:
 	User();
@@ -89,6 +91,18 @@ class User
 		// Comparer les attributs appropriés pour définir l'ordre
 		// Par exemple, comparer les noms d'utilisateur
 		return (_userName < other._userName);
+	}
+	bool operator==(const User &other) const
+	{
+		return (_id == other._id);
+	}
+	bool operator!=(const User &other) const
+	{
+		return (!(*this == other));
+	}
+	const std::set<std::string> &getChannels() const
+	{
+		return (_channels);
 	}
 };
 
