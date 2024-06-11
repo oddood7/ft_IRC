@@ -6,7 +6,7 @@
 /*   By: lde-mais <lde-mais@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/28 16:30:32 by lde-mais          #+#    #+#             */
-/*   Updated: 2024/06/04 15:24:40 by lde-mais         ###   ########.fr       */
+/*   Updated: 2024/06/11 18:20:35 by lde-mais         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,7 +54,7 @@ class Server
 	void setUser(User &user, const std::string &userInfo);
 	void setNick(User &user, const std::string &nickname);
 	void quit(User &user, const std::string &message);
-
+	void removeUser(int userIndex);
 	typedef void (Server::*CommandFunction)(User &, const std::string &);
 	std::map<std::string, CommandFunction> _commandFunctions;
 

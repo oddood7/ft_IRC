@@ -6,7 +6,7 @@
 /*   By: lde-mais <lde-mais@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/28 16:30:15 by lde-mais          #+#    #+#             */
-/*   Updated: 2024/06/06 15:41:50 by lde-mais         ###   ########.fr       */
+/*   Updated: 2024/06/11 19:07:07 by lde-mais         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -140,67 +140,70 @@ void Server::acceptNewConnection()
 	}
 }
 
+void Server::removeUser(int userIndex)
+{
+    int fd = _fds[userIndex].fd;
+    close(fd);
+    std::cout << "User disconnected" << std::endl;
+    UsersManage.erase(fd);
+
+    // Décaler les descripteurs de fichiers pour maintenir la continuité
+    for (int i = userIndex; i < _activeUsers - 1; ++i) {
+        _fds[i] = _fds[i + 1];
+    }
+    _fds[_activeUsers - 1].fd = -1; // Nettoyer l'entrée finale
+    _activeUsers--;
+}
+
+
+
+
 void Server::processUserData(int userIndex)
 {
-	char	buffer[1024];
-	int		num_bytes;
-
-	num_bytes = recv(_fds[userIndex].fd, buffer, sizeof(buffer), 0);
-	if (num_bytes <= 0)
-	{
-		// Le user s'est déconnecté
-		close(_fds[userIndex].fd);
-		std::cout << "User disconnected" << std::endl;
-		// Décaler les descripteurs de fichiers pour maintenir la continuité
-		for (int i = userIndex; i < _activeUsers; ++i)
-		{
-			_fds[i] = _fds[i + 1];
-		}
-		_activeUsers--;
-	}
-	else
-	{
-		buffer[num_bytes] = '\0';
-		std::cout << "Received data from user " << userIndex << ": " << buffer << std::endl;
-		std::string receivedData(buffer);
-		// Tokenisez la donnée reçue pour séparer la commande et les arguments
-		std::vector<std::string> tokens;
-		std::string token;
-		std::istringstream iss(receivedData);
-		while (std::getline(iss, token, ' '))
-		{
-			std::istringstream subIss(token);
-			std::string subToken;
-			while (std::getline(subIss, subToken, '\n'))
-			{
-				if (!subToken.empty())
-				{
-					tokens.push_back(subToken);
-				}
-			}
-		}
-		if (tokens.empty())
-		{
-			// La donnée reçue est invalide, gérez l'erreur
-			return ;
-		}
-		std::string command = tokens[0];
-		std::map<std::string,
-			CommandFunction>::iterator it = _commandFunctions.find(command);
-		if (it != _commandFunctions.end())
-		{
-			User &user = UsersManage[_fds[userIndex].fd];
-			std::string args = tokens.size() > 1 ? tokens[1] : "";
-			(this->*(it->second))(user, args);
-		}
-		else
-		{
-			std::string errorMessage = ERR_UNKNOWNCOMMAND(command);
-			send(_fds[userIndex].fd, errorMessage.c_str(),
-				errorMessage.length(), 0);
-		}
-	}
+    char buffer[1024];
+    int num_bytes = recv(_fds[userIndex].fd, buffer, sizeof(buffer), 0);
+    if (num_bytes <= 0) {
+        // Le user s'est déconnecté
+        removeUser(userIndex);
+    } else {
+        buffer[num_bytes] = '\0';
+        std::cout << "Received data from user " << userIndex << ": " << buffer << std::endl;
+        std::string receivedData(buffer);
+        // Tokenisez la donnée reçue pour séparer la commande et les arguments
+        std::vector<std::string> tokens;
+        std::string token;
+        std::istringstream iss(receivedData);
+        while (std::getline(iss, token, ' ')) {
+            std::istringstream subIss(token);
+            std::string subToken;
+            while (std::getline(subIss, subToken, '\n')) {
+                if (!subToken.empty()) {
+                    tokens.push_back(subToken);
+                }
+            }
+        }
+        if (tokens.empty()) {
+            // La donnée reçue est invalide, gérez l'erreur
+            return;
+        }
+        std::string command = tokens[0];
+        std::map<std::string, CommandFunction>::iterator it = _commandFunctions.find(command);
+        if (it != _commandFunctions.end()) {
+            User &user = UsersManage[_fds[userIndex].fd];
+            std::string args = tokens.size() > 1 ? tokens[1] : "";
+            if (command == "/QUIT") {
+                (this->*(it->second))(user, args);
+                return; // Quitte la boucle après avoir traité /QUIT
+            } else {
+                (this->*(it->second))(user, args);
+            }
+        } else {
+            std::string errorMessage = ERR_UNKNOWNCOMMAND(command);
+            send(_fds[userIndex].fd, errorMessage.c_str(), errorMessage.length(), 0);
+        }
+    }
 }
+
 std::string int_to_string(int value)
 {
 	std::ostringstream oss;
@@ -210,43 +213,31 @@ std::string int_to_string(int value)
 
 void Server::login(User &user, const std::string &password)
 {
-	int	userIndex;
-
-	// Vérifier si le mot de passe est correct
-	if (password == _password)
-	{
-		// Authentifier l'utilisateur
-		user.setAuthenticated(true);
-		// Envoyer un message de bienvenue à l'utilisateur
-		std::string welcomeMessage = RPL_WELCOME(user_id("localhost",
-				user.getNick()), user.getNick());
-		send(user.getSocket(), welcomeMessage.c_str(), welcomeMessage.length(),
-			0);
-		std::cout << "User authenticated successfully" << std::endl;
-	}
-	else
-	{
-		// Le mot de passe est incorrect, déconnecter l'utilisateur
-		std::string errorMessage = ERR_PASSWDMISMATCH(user_id("localhost",
-				user.getNick()));
-		send(user.getSocket(), errorMessage.c_str(), errorMessage.length(), 0);
-		std::cerr << "User failed to authenticate" << std::endl;
-		close(user.getSocket());
-		// Retirer l'utilisateur de la liste des utilisateurs connectés
-		std::map<int, User>::iterator it = UsersManage.find(user.getSocket());
-		if (it != UsersManage.end())
-		{
-			UsersManage.erase(it);
-		}
-		// Décaler les descripteurs de fichiers pour maintenir la continuité
-		userIndex = getUserIndex(user.getSocket());
-		for (int i = userIndex; i < _activeUsers; ++i)
-		{
-			_fds[i] = _fds[i + 1];
-		}
-		_activeUsers--;
-	}
+    // Vérifier si le mot de passe est correct
+    if (password == _password)
+    {
+        // Authentifier l'utilisateur
+        user.setAuthenticated(true);
+        // Envoyer un message de bienvenue à l'utilisateur
+        std::string welcomeMessage = RPL_WELCOME(user_id("localhost",
+                user.getNick()), user.getNick());
+        send(user.getSocket(), welcomeMessage.c_str(), welcomeMessage.length(),
+            0);
+        std::cout << "User authenticated successfully" << std::endl;
+    }
+    else
+    {
+		  // Le mot de passe est incorrect, envoyer un message d'erreur au client
+        std::string errorMessage = ERR_PASSWDMISMATCH(user_id("localhost",
+                user.getNick()));
+        send(user.getSocket(), errorMessage.c_str(), errorMessage.length(), 0);
+        // Le mot de passe est incorrect, fermer la connexion avec l'utilisateur
+        close(user.getSocket());
+        std::cerr << "User failed to authenticate" << std::endl;
+    }
 }
+
+
 
 void Server::joinChannel(User &user, const std::string &channelName)
 {
@@ -385,59 +376,38 @@ void Server::createChannel(User &user, const std::string &channelName)
 
 void Server::quit(User &user, const std::string &message)
 {
-	if (!user.isAuthenticated())
-	{
-		std::cout << "ici 1" << std::endl;
-		std::string errorMessage = ERR_NOTREGISTERED(user_id("localhost",
-				user.getNick()));
-		send(user.getSocket(), errorMessage.c_str(), errorMessage.length(), 0);
-		return ;
-	}
+    if (!user.isAuthenticated()) {
+        std::string errorMessage = ERR_NOTREGISTERED(user_id("localhost", user.getNick()));
+        send(user.getSocket(), errorMessage.c_str(), errorMessage.length(), 0);
+        return;
+    }
 
-	// Envoyer un message de notification aux autres utilisateurs des canaux partagés
-	std::set<std::string> channels = user.getChannels();
-	for (std::set<std::string>::iterator it = channels.begin(); it != channels.end(); ++it)
-	{
-		std::string channel = *it;
-		std::map<std::string,
-			Channel>::iterator channelIt = _channels.find(channel);
-		if (channelIt != _channels.end())
-		{
-			Channel &currentChannel = channelIt->second;
-			std::set<User> users = currentChannel.getUsers();
-			for (std::set<User>::iterator userIt = users.begin(); userIt != users.end(); ++userIt)
-			{
-				if (*userIt != user)
-				{
-					std::string quitMessage = RPL_QUIT(user_id("localhost",
-							user.getNick()), message);
-					send(userIt->getSocket(), quitMessage.c_str(),
-						quitMessage.length(), 0);
-				}
-			}
-			currentChannel.removeUser(user);
-		}
-	}
+    // Envoyer un message de notification aux autres utilisateurs des canaux partagés
+    std::set<std::string> channels = user.getChannels();
+    std::set<std::string>::iterator channelIt;
+    for (channelIt = channels.begin(); channelIt != channels.end(); ++channelIt) {
+        std::string channel = *channelIt;
+        std::map<std::string, Channel>::iterator channelIt = _channels.find(channel);
+        if (channelIt != _channels.end()) {
+            Channel &currentChannel = channelIt->second;
+            std::set<User> users = currentChannel.getUsers();
+            std::set<User>::iterator userIt;
+            for (userIt = users.begin(); userIt != users.end(); ++userIt) {
+                User otherUser = *userIt;
+                if (otherUser != user) {
+                    std::string quitMessage = RPL_QUIT(user_id("localhost", user.getNick()), message);
+                    send(otherUser.getSocket(), quitMessage.c_str(), quitMessage.length(), 0);
+                }
+            }
+            currentChannel.removeUser(user);
+        }
+    }
 
-	// Envoyer un message de confirmation au client qui a initié la commande
-	std::string confirmMessage = "You have been disconnected from the server.\n";
-	send(user.getSocket(), confirmMessage.c_str(), confirmMessage.length(), 0);
+    // Envoyer un message de confirmation au client qui a initié la commande
+    std::string confirmMessage = "You have been disconnected from the server.\n";
+    send(user.getSocket(), confirmMessage.c_str(), confirmMessage.length(), 0);
 
-	// Fermer la connexion avec le client
-	close(user.getSocket());
-
-	// Retirer l'utilisateur de la liste des utilisateurs connectés
-	std::map<int, User>::iterator it = UsersManage.find(user.getSocket());
-	if (it != UsersManage.end())
-	{
-		UsersManage.erase(it);
-	}
-
-	// Décaler les descripteurs de fichiers pour maintenir la continuité
-	int userIndex = getUserIndex(user.getSocket());
-	for (int i = userIndex; i < _activeUsers; ++i)
-	{
-		_fds[i] = _fds[i + 1];
-	}
-	_activeUsers--;
+    // Fermer la connexion avec le client
+    close(user.getSocket());
 }
+
