@@ -6,7 +6,7 @@
 /*   By: lde-mais <lde-mais@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/17 14:21:16 by lde-mais          #+#    #+#             */
-/*   Updated: 2024/06/24 11:05:04 by lde-mais         ###   ########.fr       */
+/*   Updated: 2024/06/28 13:33:37 by lde-mais         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,13 +73,13 @@ class Server
 		void	user(User &user);
 		void	pass(User &user);
 		void	ping(User &user);
-		void	mode(User &user);
 		void	msg(User &user);
 		void	quit(User &user);
 		void	join(User &user);
-		void	topic(User &user);
-		void	invite(User &user);
-		void	kick(User &user);
+		//void	mode(User &user);
+		//void	topic(User &user);
+		//void	invite(User &user);
+		//void	kick(User &user);
 
 		void	nickIrssi(User &user, int i);
 		void	userIrssi(User &user, int i);
@@ -88,12 +88,7 @@ class Server
 		std::string	ft_toupper(std::string str);
 		int		searchUserChannel(User &user);
 		int		is_op(User &user, std::string nickname);
-		int		operator_mode(User &user);
 		int		isInChannel(User &user, std::string channel);
-		int		key_mode(User &user);
-		int		max_User_mode(User &user);
-		void	invite_mode(User &user);
-		void	topic_mode(User &user);
 		void	deleteFromChannel(User &user);
 		Channel &getUserChannel(std::string channel);
 		void	send_all(Channel &channel, std::string rpl, std::string user);
