@@ -6,7 +6,7 @@
 /*   By: lde-mais <lde-mais@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/17 14:17:19 by lde-mais          #+#    #+#             */
-/*   Updated: 2024/06/24 12:03:35 by lde-mais         ###   ########.fr       */
+/*   Updated: 2024/08/03 15:45:51 by lde-mais         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,9 +25,9 @@ void	Server::commandInit()
 	_commandFunctions["PRIVMSG"] = &Server::msg;
 	_commandFunctions["USER"] = &Server::user;
 	// _commandFunctions["OPER"] = &Server::becomeOper;
-	// _commandFunctions["KICK"] = &Server::kickUser;
-	// _commandFunctions["INVITE"] & Server::inviteUser;
-	// _commandFunctions["TOPIC"] = &Server::setTopic;
+	_commandFunctions["KICK"] = &Server::kick;
+	_commandFunctions["INVITE"] = &Server::invite;
+	_commandFunctions["TOPIC"] = &Server::topic;
 	// _commandFunctions["MODE"] = &Server::setMode;
 }
 

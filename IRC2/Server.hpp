@@ -6,7 +6,7 @@
 /*   By: lde-mais <lde-mais@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/17 14:21:16 by lde-mais          #+#    #+#             */
-/*   Updated: 2024/06/28 13:33:37 by lde-mais         ###   ########.fr       */
+/*   Updated: 2024/08/03 15:44:14 by lde-mais         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,9 +77,9 @@ class Server
 		void	quit(User &user);
 		void	join(User &user);
 		//void	mode(User &user);
-		//void	topic(User &user);
-		//void	invite(User &user);
-		//void	kick(User &user);
+		void	topic(User &user);
+		void	invite(User &user);
+		void	kick(User &user);
 
 		void	nickIrssi(User &user, int i);
 		void	userIrssi(User &user, int i);

@@ -8,6 +8,8 @@ SRCS = main.cpp Server.cpp User.cpp Channel.cpp ServerUtils.cpp \
 		Commandes/Nick.cpp \
 		Commandes/Quit.cpp \
 		Commandes/Msg.cpp \
+		Commandes/Kick.cpp \
+		Commandes/Invite.cpp \
 
 OBJS = $(SRCS:.cpp=.o)
 
