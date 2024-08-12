@@ -6,7 +6,7 @@
 /*   By: lde-mais <lde-mais@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/17 17:53:00 by lde-mais          #+#    #+#             */
-/*   Updated: 2024/06/24 10:46:44 by lde-mais         ###   ########.fr       */
+/*   Updated: 2024/08/12 14:25:32 by lde-mais         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,10 +59,10 @@ void	joinChannel(User &user, Channel &channel)
 	}
 	channel.getChatters().push_back(user.getNickName());
 	std::string rpl;
-	//if (channel.getTopic().size() > 0)
-	//	rpl = RPL_TOPIC(channel.getName(), channel.getTopic());
-	//else
-	//	rpl = RPL_NOTOPIC(channel.getName());
+	if (channel.getTopic().size() > 0)
+		rpl = RPL_TOPIC(channel.getName(), channel.getTopic());
+	else
+		rpl = RPL_NOTOPIC(channel.getName());
 	user.setChannel(channel);
 	send(user.getSocket(), rpl.c_str(), rpl.size(), 0);
 }

@@ -1,98 +1,46 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   Channel.cpp                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: lde-mais <lde-mais@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/06/17 14:36:41 by lde-mais          #+#    #+#             */
+/*   Updated: 2024/06/17 17:52:55 by lde-mais         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "Channel.hpp"
 
-// Constructeur
-Channel::Channel(const std::string &name) : _name(name), _topic(""), _mode(0),
-	_userLimit(0), _passwordProtected(false)
-{
+Channel::Channel() {
+
 }
 
-// Ajouter un utilisateur au canal
-void Channel::addUser(const User &user)
-{
-	_users.insert(user);
+Channel::Channel(std::string name, std::string owner) : _name(name), _owner(owner), \
+		_i(false), _t(false), _l(0) {
+	
+	_operator.push_back(_owner);
 }
 
-// Retirer un utilisateur du canal
-void Channel::removeUser(const User &user)
-{
-	_users.erase(user);
+Channel::Channel(const Channel& cpy) : _name(cpy._name), _topic(cpy._topic), _owner(cpy._owner), \
+		_i(cpy._i), _t(cpy._t), _l(cpy._l), _operator(cpy._operator), _invite(cpy._invite), _chatters(cpy._chatters) {
+
 }
 
-// Définir un opérateur du canal
-void Channel::setOperator(const User &user, bool isOperator)
-{
-	if (isOperator)
-	{
-		_operators.insert(user);
+Channel::~Channel() {
+}
+
+Channel &Channel::operator=(Channel const & cpy) {
+	if (this != &cpy) {
+		this->_name = cpy._name;
+		this->_topic = cpy._topic;
+		this->_owner = cpy._owner;
+		this->_i = cpy._i;
+		this->_t = cpy._t;
+		this->_l = cpy._l;
+		this->_operator = cpy._operator;
+		this->_invite = cpy._invite;
+		this->_chatters = cpy._chatters;
 	}
-	else
-	{
-		_operators.erase(user);
-	}
-}
-
-// Définir le sujet du canal
-void Channel::setTopic(const std::string &topic)
-{
-	_topic = topic;
-}
-
-// Définir le mode du canal
-void Channel::setMode(int mode)
-{
-	_mode = mode;
-}
-
-// Définir la limite d'utilisateurs
-void Channel::setUserLimit(int limit)
-{
-	_userLimit = limit;
-}
-
-// Activer/Désactiver la protection par mot de passe
-void Channel::setPasswordProtected(bool passwordProtected)
-{
-	_passwordProtected = passwordProtected;
-}
-
-// Vérifier si un utilisateur est opérateur
-bool Channel::isOperator(const User &user) const
-{
-	return (_operators.count(user) > 0);
-}
-
-// Récupérer les utilisateurs du canal
-const std::set<User> &Channel::getUsers() const
-{
-	return (_users);
-}
-
-// Récupérer les opérateurs du canal
-const std::set<User> &Channel::getOperators() const
-{
-	return (_operators);
-}
-
-// Récupérer le sujet du canal
-const std::string &Channel::getTopic() const
-{
-	return (_topic);
-}
-
-// Récupérer le mode du canal
-int Channel::getMode() const
-{
-	return (_mode);
-}
-
-// Récupérer la limite d'utilisateurs
-size_t Channel::getUserLimit() const
-{
-	return (_userLimit);
-}
-
-// Vérifier si le canal est protégé par un mot de passe
-bool Channel::isPasswordProtected() const
-{
-	return (_passwordProtected);
+	return *this;
 }
