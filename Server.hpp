@@ -6,7 +6,7 @@
 /*   By: lde-mais <lde-mais@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/17 14:21:16 by lde-mais          #+#    #+#             */
-/*   Updated: 2024/08/03 15:44:14 by lde-mais         ###   ########.fr       */
+/*   Updated: 2024/08/13 15:19:59 by lde-mais         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,6 +54,7 @@ class Server
 		std::vector<Channel> _channelsList;
 
 		bool	_shutdown;
+		static bool	signal;
 
 		public:
 		
@@ -63,7 +64,7 @@ class Server
 		void	run();
 		void	closeSocket();
 		void	createUser();
-		void	deleteUser(User user);
+		void	deleteUser(User &user);
 		void	listenUser();
 		void	commandInit();
 		void	useCommand(User &user);
@@ -92,6 +93,7 @@ class Server
 		void	deleteFromChannel(User &user);
 		Channel &getUserChannel(std::string channel);
 		void	send_all(Channel &channel, std::string rpl, std::string user);
+		static void 	SignalHandler(int sig);
 
 
 };

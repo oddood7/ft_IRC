@@ -6,11 +6,13 @@
 /*   By: lde-mais <lde-mais@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/17 14:14:08 by lde-mais          #+#    #+#             */
-/*   Updated: 2024/06/24 11:12:54 by lde-mais         ###   ########.fr       */
+/*   Updated: 2024/08/13 15:19:08 by lde-mais         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Server.hpp"
+
+bool Server::signal = false;
 
 Server::Server(){}
 
@@ -63,7 +65,7 @@ Server::Server(int port, std::string pass) : _port(port), _activeUsers(0), _acti
 
 void	Server::run()
 {
-	while (_shutdown == false)
+	while (this->signal == false)
 	{
 		_pollRet = poll(_fds, _activeUsers + 1, -1);
 		if (_pollRet == -1)
@@ -74,6 +76,7 @@ void	Server::run()
 
 		if (_fds[0].revents & POLLIN)
 			createUser();
+		
 		listenUser();
 	}
 }
@@ -136,7 +139,7 @@ void Server::listenUser()
     }
 }
 
-void	Server::deleteUser(User user)
+void	Server::deleteUser(User &user)
 {
 	std::map<int, User>::iterator it = usersManage.find(user.getSocket());
 	if (it != usersManage.end())
@@ -149,3 +152,4 @@ void	Server::deleteUser(User user)
 	for (int j = user.getId(); j <= _activeUsers; ++j)
 		_fds[j] = _fds[j + 1];	
 }
+

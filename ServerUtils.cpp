@@ -6,7 +6,7 @@
 /*   By: lde-mais <lde-mais@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/17 14:17:19 by lde-mais          #+#    #+#             */
-/*   Updated: 2024/08/03 15:45:51 by lde-mais         ###   ########.fr       */
+/*   Updated: 2024/08/13 14:28:22 by lde-mais         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -112,8 +112,16 @@ int	Server::is_op(User &user, std::string nickname)
 	return -1;
 }
 
-void Server::ping(User &user)
+void    Server::ping(User& user) {
+    
+    std::string pingu = "PONG :localhost\r\n";
+    send(user.getSocket(), pingu.c_str(), pingu.size(), 0);
+    std::cout << user_id(user.getUserName(), user.getNickName()) << " " << pingu;
+}
+
+void Server::SignalHandler(int sig)
 {
-    std::string response = ":" + _name + " PONG " + _name + "\r\n";
-    send(user.getSocket(), response.c_str(), response.size(), 0);
+	(void)sig;
+	std::cout << std::endl << "signal sent." << std::endl;
+	Server::signal = true; //  to stop the server
 }

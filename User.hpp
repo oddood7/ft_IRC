@@ -6,7 +6,7 @@
 /*   By: lde-mais <lde-mais@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/17 14:33:03 by lde-mais          #+#    #+#             */
-/*   Updated: 2024/06/17 14:33:40 by lde-mais         ###   ########.fr       */
+/*   Updated: 2024/08/13 15:19:49 by lde-mais         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,7 +65,7 @@ class User
 		bool		getDeco() const {return _deco;};
 		std::string		&getChannel() {return _activeChannel;};
 		std::vector<std::string>	&getBuf() {return _buf;};
-
+		
 		void	setId(int i) {_id = i;};
 		void	setNickName(const std::string &nick) {_nickName = nick;};
 		void	setUserName(const std::string &user) {_userName = user;};

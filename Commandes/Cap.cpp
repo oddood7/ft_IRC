@@ -6,7 +6,7 @@
 /*   By: lde-mais <lde-mais@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/17 17:39:45 by lde-mais          #+#    #+#             */
-/*   Updated: 2024/06/24 11:51:15 by lde-mais         ###   ########.fr       */
+/*   Updated: 2024/08/13 12:33:07 by lde-mais         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,24 +66,20 @@ void Server::cap(User &user)
         for (size_t i = 0; i < user.getBuf().size(); i++)
         {
             std::string command = user.getBuf()[i];
-            std::cerr << "Received command: " << command << std::endl;
 
             if (command == "PASS")
             {
                 passw = passIrssi(user, i);
-                std::cerr << "Processed PASS command. Result: " << (passw ? "Success" : "Failure") << std::endl;
             }
             else if (command == "NICK")
             {
                 nickIrssi(user, i);
                 nick = true;
-                std::cerr << "Processed NICK command." << std::endl;
             }
             else if (command == "USER")
             {
                 userIrssi(user, i);
                 userCmd = true;
-                std::cerr << "Processed USER command." << std::endl;
             }
 
             std::cerr << "Sending response: " << user.getRpl() << std::endl;
@@ -108,3 +104,4 @@ void Server::cap(User &user)
         std::cerr << RED << ERR_UNKNOWNCOMMAND(user.getBuf()[0]) << RESET << std::endl;
     }
 }
+

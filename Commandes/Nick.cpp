@@ -6,7 +6,7 @@
 /*   By: lde-mais <lde-mais@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/17 18:08:48 by lde-mais          #+#    #+#             */
-/*   Updated: 2024/06/24 11:28:31 by lde-mais         ###   ########.fr       */
+/*   Updated: 2024/08/13 12:34:29 by lde-mais         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,7 +64,7 @@ void	Server::nick(User &user)
 
 void	Server::nickIrssi(User &user, int i)
 {
-	for (std::map<int, User>::iterator ite = usersManage.begin(); ite != usersManage.end(); ite++)
+	for (std::map<int, User>::iterator ite = usersManage.begin(); ite != usersManage.end(); ++ite)
 	{
 		if (user.getBuf().size() > (size_t)i){
 			if (ite->second.getNickName() == user.getBuf()[i + 1]){
