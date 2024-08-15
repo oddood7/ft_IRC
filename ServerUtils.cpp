@@ -6,7 +6,7 @@
 /*   By: lde-mais <lde-mais@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/17 14:17:19 by lde-mais          #+#    #+#             */
-/*   Updated: 2024/08/13 14:28:22 by lde-mais         ###   ########.fr       */
+/*   Updated: 2024/08/15 12:15:32 by lde-mais         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@ void	Server::commandInit()
 	//_commandFunctions["CREATE"] = &Server::createChannel;
 	_commandFunctions["JOIN"] = &Server::join;
 	_commandFunctions["CAP"] = &Server::cap;
-	//_commandFunctions["PART"] = &Server::partChannel;
+	_commandFunctions["PART"] = &Server::part;
 	_commandFunctions["PASS"] = &Server::pass;
 	_commandFunctions["NICK"] = &Server::nick;
 	_commandFunctions["QUIT"] = &Server::quit;

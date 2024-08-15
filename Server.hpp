@@ -6,7 +6,7 @@
 /*   By: lde-mais <lde-mais@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/17 14:21:16 by lde-mais          #+#    #+#             */
-/*   Updated: 2024/08/13 15:19:59 by lde-mais         ###   ########.fr       */
+/*   Updated: 2024/08/15 12:28:06 by lde-mais         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,6 +79,7 @@ class Server
 		void	join(User &user);
 		//void	mode(User &user);
 		void	topic(User &user);
+		void	part(User &user);
 		void	invite(User &user);
 		void	kick(User &user);
 
@@ -88,6 +89,9 @@ class Server
 
 		std::string	ft_toupper(std::string str);
 		int		searchUserChannel(User &user);
+		void 	deleteChannel(const std::string& channelName);
+		User*		getUserByNickname(const std::string &nickname);
+		std::vector<std::string> split(const std::string &s, const std::string &delimiter);
 		int		is_op(User &user, std::string nickname);
 		int		isInChannel(User &user, std::string channel);
 		void	deleteFromChannel(User &user);

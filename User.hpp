@@ -6,7 +6,7 @@
 /*   By: lde-mais <lde-mais@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/17 14:33:03 by lde-mais          #+#    #+#             */
-/*   Updated: 2024/08/13 15:19:49 by lde-mais         ###   ########.fr       */
+/*   Updated: 2024/08/15 12:54:58 by lde-mais         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,12 +23,14 @@
 class User
 {
 	private:
+		
 		int _socket;
 		int	_id;
-
+		
 
 		sockaddr_in _addr;
 
+		std::string _hostName;
 		std::string _nickName;
 		std::string _userName;
 		std::string _host;
@@ -55,6 +57,7 @@ class User
 		int			getSocket()  const {return _socket;};
 		int			getId()  const {return _id;};
 		std::string	getNickName() const {return _nickName;};
+		std::string	getHostName() const {return _hostName;};
 		std::string	getUserName() const {return _userName;};
 		std::string	getPass() const {return _pass;};
 		std::string getHost() const {return _host;};
@@ -75,7 +78,7 @@ class User
 		void	setVerif();
 		void	setDeco() {_deco = true;};
 		void	setIrssi() {_irssi = true;};
-		void	setChannel(Channel channel) {_activeChannel = channel.getName();};
+		void	setChannel(Channel channel);
 		void	setBuf(const std::string buffer);
 
 

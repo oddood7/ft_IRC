@@ -6,7 +6,7 @@
 /*   By: lde-mais <lde-mais@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/17 14:31:44 by lde-mais          #+#    #+#             */
-/*   Updated: 2024/06/17 14:39:21 by lde-mais         ###   ########.fr       */
+/*   Updated: 2024/08/15 12:56:15 by lde-mais         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,4 +64,13 @@ void	User::setBuf(const std::string buffer)
 
 void	User::setVerif() {
 	_verified = true;
+}
+
+void User::setChannel(Channel channel) {
+    if (channel.getName().empty()) {
+        _activeChannel = "";
+    }
+	else {
+        _activeChannel = channel.getName();
+    }
 }
