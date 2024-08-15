@@ -6,79 +6,108 @@
 /*   By: lde-mais <lde-mais@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/17 18:08:48 by lde-mais          #+#    #+#             */
-/*   Updated: 2024/08/13 12:34:29 by lde-mais         ###   ########.fr       */
+/*   Updated: 2024/08/15 14:13:12 by lde-mais         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../Server.hpp"
 #include "../Utils.hpp"
 
-void	Server::nick(User &user)
+void Server::nick(User &user)
 {
-	if (user.getBuf().size() == 1) {
-		std::cerr << RED << ERR_NEEDMOREPARAMS(_name, user.getBuf()[0]) << RESET << std::endl;
-		return ;
-	}
-	std::string nickname;
+    if (user.getBuf().size() == 1) {
+        std::string err = ERR_NEEDMOREPARAMS(_name, user.getBuf()[0]);
+        send(user.getSocket(), err.c_str(), err.size(), 0);
+        return;
+    }
 
-	for (size_t i = 1; i < user.getBuf().size(); i++){
-		nickname += user.getBuf()[i];
-		if (i < user.getBuf().size() - 1)
-			nickname += " ";
-	}
-	
-	if (user.getBuf().size() > 2){
-		std::cerr << RED << ERR_ERRONEUSNICKNAME(_name, nickname) << RESET << std::endl;
-	}
-	else if (!user.getPass().empty())
-	{
-		for (size_t i = 0; i < user.getBuf()[1].size(); i++)
-		{
-			if (!isalnum(user.getBuf()[1][i]))
-			{
-				std::cerr << RED << ERR_ERRONEUSNICKNAME(_name, nickname) << RESET << std::endl;
-				user.getBuf().clear();
-				return ;
-			}
-		}
-		for (std::map<int, User>::iterator ite = usersManage.begin(); ite != usersManage.end(); ite++)
-		{
-			if (nickname.size() > 9)
-				nickname = nickname.substr(0, 9);
-			if (nickname == ite->second.getNickName())
-			{
-				std::cerr << RED << ERR_NICKNAMEINUSE(_name, nickname) << RESET << std::endl;
-				user.getBuf().clear();
-				return ;
-			}
-		}	
-		std::string str = "NICK set to " + nickname + "\r\n";
-		user.setNickName(nickname);
-		send(user.getSocket(), str.c_str(), str.size(), 0);
-	}
-	else {
-		std::cerr << RED << ERR_NOTREGISTERED(_name) << RESET << std::endl;
-		std::cerr << RED << "Enter PASS, NICK, USER in this order" << RESET <<std::endl;
-	}
+    std::string newNick = user.getBuf()[1];
+    std::string oldNick = user.getNickName();
+
+    if (newNick.size() > 9) {
+        newNick = newNick.substr(0, 9);
+    }
+
+    for (size_t i = 0; i < newNick.size(); i++) {
+        if (!isalnum(newNick[i])) {
+            std::string err = ERR_ERRONEUSNICKNAME(_name, newNick);
+            send(user.getSocket(), err.c_str(), err.size(), 0);
+            return;
+        }
+    }
+
+    for (std::map<int, User>::iterator ite = usersManage.begin(); ite != usersManage.end(); ite++) {
+        if (newNick == ite->second.getNickName()) {
+            std::string err = ERR_NICKNAMEINUSE(_name, newNick);
+            send(user.getSocket(), err.c_str(), err.size(), 0);
+            return;
+        }
+    }
+    user.setNickName(newNick);
+
+    std::string nickChangeMsg = ":" + oldNick + "!" + user.getUserName() + "@" + user.getHost() + " NICK :" + newNick + "\r\n";
+
+    for (std::map<int, User>::iterator it = usersManage.begin(); it != usersManage.end(); ++it) {
+        send(it->second.getSocket(), nickChangeMsg.c_str(), nickChangeMsg.size(), 0);
+    }
+
+    for (size_t j = 0; j < _channelsList.size(); ++j) {
+        std::vector<std::string>& chatters = _channelsList[j].getChatters();
+        for (size_t k = 0; k < chatters.size(); ++k) {
+            if (chatters[k] == oldNick) {
+                chatters[k] = newNick;
+                break;
+            }
+        }
+    }
+
+    std::cout << "Nickname changed from " << oldNick << " to " << newNick << std::endl;
 }
 
-void	Server::nickIrssi(User &user, int i)
+void Server::nickIrssi(User &user, int i)
 {
-	for (std::map<int, User>::iterator ite = usersManage.begin(); ite != usersManage.end(); ++ite)
-	{
-		if (user.getBuf().size() > (size_t)i){
-			if (ite->second.getNickName() == user.getBuf()[i + 1]){
-				std::stringstream ss;
-				ss << _activeUsers;
-				std::string str = ss.str();
-				user.setNickName(user.getBuf()[i + 1] + str);
-				user.setRpl("NICK command accepted with modification.\n");
-				return;
-			}
-		}
-	}
-	if (user.getBuf().size() > (size_t)i)
-		user.setNickName(user.getBuf()[i + 1]);
-	else
-		user.setNickName("default");	
+    if (user.getBuf().size() <= (size_t)i + 1) {
+        std::string err = ERR_NONICKNAMEGIVEN(user.getHost());
+        send(user.getSocket(), err.c_str(), err.size(), 0);
+        return;
+    }
+
+    std::string newNick = user.getBuf()[i + 1];
+    std::string oldNick = user.getNickName();
+
+    for (std::map<int, User>::iterator ite = usersManage.begin(); ite != usersManage.end(); ++ite)
+    {
+        if (ite->second.getNickName() == newNick) {
+            std::stringstream ss;
+            ss << _activeUsers;
+            newNick += ss.str();
+            break;
+        }
+    }
+
+    user.setNickName(newNick);
+
+    std::string nickChangeMsg = RPL_NICK(oldNick, user.getUserName(), newNick);
+	if (user.getIrssi()) {
+    	std::string irssiUpdate = ":" + _name + " 004 " + newNick + " " + _name + " ircserv-1.0 DOQRSZaghilopswz CFILMPQSbcefgijklmnopqrstvz bkloveqjfI\r\n";
+    	send(user.getSocket(), irssiUpdate.c_str(), irssiUpdate.size(), 0);
+	}	
+    
+    for (std::map<int, User>::iterator it = usersManage.begin(); it != usersManage.end(); ++it)
+    {
+        send(it->second.getSocket(), nickChangeMsg.c_str(), nickChangeMsg.size(), 0);
+    }
+
+    for (size_t j = 0; j < _channelsList.size(); ++j)
+    {
+        std::vector<std::string>& chatters = _channelsList[j].getChatters();
+        for (size_t k = 0; k < chatters.size(); ++k)
+        {
+            if (chatters[k] == oldNick)
+            {
+                chatters[k] = newNick;
+                break;
+            }
+        }
+    }
 }

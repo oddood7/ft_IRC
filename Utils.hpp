@@ -6,7 +6,7 @@
 /*   By: lde-mais <lde-mais@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/17 14:38:16 by lde-mais          #+#    #+#             */
-/*   Updated: 2024/08/15 13:01:45 by lde-mais         ###   ########.fr       */
+/*   Updated: 2024/08/15 13:44:10 by lde-mais         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,6 +55,7 @@
 # define RPL_NOTOPIC(channel) ":localhost 331 " + channel + " :No topic set for " + channel + "\r\n"
 # define RPL_TOPIC(channel, topic)":localhost 332 " + channel + " " + channel + " " + topic + "\r\n"
 # define RPL_INVITING(channel, nickname) channel + " " + nickname + "\r\n"
+# define RPL_NICK(oclient, uclient, client) (":" + oclient + "!" + uclient + "@localhost NICK " +  client + "\r\n")
 # define RPL_KICK(channel, operator, nickname, reason) ":" + operator + " KICK " + channel + " " + nickname + " " + reason + "\r\n"
 # define RPL_PRIV(nickname, target, message) ":" + nickname + " PRIVMSG "  + target + " " + message + "\r\n"
 # define RPL_NOTICE(nickname, target, message) ":" + nickname + " NOTICE " + target + " " + message + "\r\n"
