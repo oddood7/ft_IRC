@@ -12,6 +12,7 @@ SRCS = main.cpp Server.cpp User.cpp Channel.cpp ServerUtils.cpp \
 		Commandes/Invite.cpp \
 		Commandes/Topic.cpp \
 		Commandes/Part.cpp \
+		Commandes/Mode.cpp \
 
 OBJS = $(SRCS:.cpp=.o)
 

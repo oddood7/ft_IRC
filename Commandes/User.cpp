@@ -6,7 +6,7 @@
 /*   By: lde-mais <lde-mais@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/17 18:15:00 by lde-mais          #+#    #+#             */
-/*   Updated: 2024/08/13 12:26:26 by lde-mais         ###   ########.fr       */
+/*   Updated: 2024/08/19 15:25:07 by lde-mais         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,5 +68,5 @@ void	Server::userIrssi(User &user, int i)
 		}
 	}
 	user.setUserName(str);
-	user.setRpl("USER command accepted.\n");
+	//user.setRpl("USER command accepted.\n");
 }

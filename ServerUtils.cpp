@@ -6,7 +6,7 @@
 /*   By: lde-mais <lde-mais@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/17 14:17:19 by lde-mais          #+#    #+#             */
-/*   Updated: 2024/08/15 12:15:32 by lde-mais         ###   ########.fr       */
+/*   Updated: 2024/08/19 16:13:43 by lde-mais         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ void	Server::commandInit()
 	_commandFunctions["KICK"] = &Server::kick;
 	_commandFunctions["INVITE"] = &Server::invite;
 	_commandFunctions["TOPIC"] = &Server::topic;
-	// _commandFunctions["MODE"] = &Server::setMode;
+	_commandFunctions["MODE"] = &Server::mode;
 }
 
 Channel &Server::getUserChannel(std::string channel)

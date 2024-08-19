@@ -6,7 +6,7 @@
 /*   By: lde-mais <lde-mais@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/17 14:21:16 by lde-mais          #+#    #+#             */
-/*   Updated: 2024/08/15 12:28:06 by lde-mais         ###   ########.fr       */
+/*   Updated: 2024/08/19 16:17:55 by lde-mais         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,7 +77,7 @@ class Server
 		void	msg(User &user);
 		void	quit(User &user);
 		void	join(User &user);
-		//void	mode(User &user);
+		void	mode(User &user);
 		void	topic(User &user);
 		void	part(User &user);
 		void	invite(User &user);
@@ -87,6 +87,11 @@ class Server
 		void	userIrssi(User &user, int i);
 		bool	passIrssi(User &user, int i);
 
+		void    modeInvite(User &user);
+		void	modeTopic(User &user);
+		int 	modeKey(User &user);
+		int		modeMaxUser(User &user);
+		int 	operatorMode(User &user);
 		std::string	ft_toupper(std::string str);
 		int		searchUserChannel(User &user);
 		void 	deleteChannel(const std::string& channelName);
