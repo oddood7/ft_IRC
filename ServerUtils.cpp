@@ -6,7 +6,7 @@
 /*   By: lde-mais <lde-mais@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/17 14:17:19 by lde-mais          #+#    #+#             */
-/*   Updated: 2024/08/19 16:13:43 by lde-mais         ###   ########.fr       */
+/*   Updated: 2024/08/20 16:00:08 by lde-mais         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,6 @@
 
 void	Server::commandInit()
 {
-	//_commandFunctions["CREATE"] = &Server::createChannel;
 	_commandFunctions["JOIN"] = &Server::join;
 	_commandFunctions["CAP"] = &Server::cap;
 	_commandFunctions["PART"] = &Server::part;
@@ -24,7 +23,6 @@ void	Server::commandInit()
 	_commandFunctions["PING"] = &Server::ping;
 	_commandFunctions["PRIVMSG"] = &Server::msg;
 	_commandFunctions["USER"] = &Server::user;
-	// _commandFunctions["OPER"] = &Server::becomeOper;
 	_commandFunctions["KICK"] = &Server::kick;
 	_commandFunctions["INVITE"] = &Server::invite;
 	_commandFunctions["TOPIC"] = &Server::topic;
@@ -57,7 +55,6 @@ void	Server::deleteFromChannel(User &user)
 		{
 			if (user.getNickName() == _channelsList[i].getChatters()[j])
 			{
-				std::cout << _channelsList[i].getChatters()[j] << std::endl;
 				_channelsList[i].getChatters().erase(_channelsList[i].getChatters().begin() + j);
 				j--;
 			}
@@ -122,6 +119,7 @@ void    Server::ping(User& user) {
 void Server::SignalHandler(int sig)
 {
 	(void)sig;
-	std::cout << std::endl << "signal sent." << std::endl;
+	std::cout << std::endl << "Signal Recieved ! Terminating MYIRC!" << std::endl;
 	Server::signal = true; //  to stop the server
 }
+

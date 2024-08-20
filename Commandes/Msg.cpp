@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   Msg.cpp                                            :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: lde-mais <lde-mais@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/08/20 16:10:31 by lde-mais          #+#    #+#             */
+/*   Updated: 2024/08/20 16:10:50 by lde-mais         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../Server.hpp"
 
 int Server::searchUserChannel(User &user)
@@ -15,50 +27,6 @@ int Server::searchUserChannel(User &user)
 	return 0;
 }
 
-// void	Server::msg(User &user)
-// {
-// 	std::string ret;
-// 	std::string	message;
-
-// 	if (user.getBuf().size() < 3) {
-// 		ret = ERR_NEEDMOREPARAMS(user.getHost(), user.getBuf()[0]);
-// 		send(user.getSocket(), ret.c_str(), ret.size(), 0);
-// 		return ;
-// 	}
-	
-// 	int b = searchUserChannel(user);
-
-// 	if (b == 1)
-// 	{
-// 		for (size_t i = 2; i < user.getBuf().size(); i++){
-// 			message += user.getBuf()[i];
-// 			if (i < user.getBuf().size() - 1)
-// 				message += " ";
-// 		}
-// 		size_t j;
-// 		for (j = 0; j < usersManage.size(); j++){
-// 			if (user.getBuf()[1] ==  usersManage[j].getNickName())
-// 				break;
-// 		}
-// 		ret = RPL_PRIV(user.getNickName(), user.getBuf()[1], message);
-// 		send(usersManage[j].getSocket(), ret.c_str(), ret.size(), 0);
-// 	}
-// 	else if (b == 2)
-// 	{
-// 		for (size_t i = 2; i < user.getBuf().size(); i++){
-// 			message += user.getBuf()[i];
-// 			if (i < user.getBuf().size() - 1)
-// 				message += " ";
-// 		}
-// 		ret = RPL_PRIV(user.getNickName(), user.getBuf()[1], message);
-// 		send_all(getUserChannel(user.getChannel()), ret, user.getNickName());
-// 	}
-// 	else {
-// 		ret = ERR_NOSUCHNICK(user.getBuf()[1]);
-// 		send(user.getSocket(), ret.c_str(), ret.size(), 0);
-// 	}
-// }
-
 void Server::msg(User &user)
 {
     std::string ret;
@@ -72,7 +40,6 @@ void Server::msg(User &user)
     
     std::string target = user.getBuf()[1];
     
-    // Construire le message
     for (size_t i = 2; i < user.getBuf().size(); i++) {
         message += user.getBuf()[i];
         if (i < user.getBuf().size() - 1)
@@ -95,7 +62,6 @@ void Server::msg(User &user)
             return;
         }
 
-        // Vérifier si l'utilisateur est dans le canal
         bool userInChannel = false;
         for (size_t i = 0; i < channel->getChatters().size(); i++) {
             if (channel->getChatters()[i] == user.getNickName()) {

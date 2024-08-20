@@ -6,7 +6,7 @@
 /*   By: lde-mais <lde-mais@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/17 14:38:16 by lde-mais          #+#    #+#             */
-/*   Updated: 2024/08/15 13:44:10 by lde-mais         ###   ########.fr       */
+/*   Updated: 2024/08/20 13:39:03 by lde-mais         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,13 +47,14 @@
 # define ERR_ERRONEUSUSER(host, user) host + " " + user + " :Erroneus user\r\n"
 # define ERR_BADPASS(host) host + " :Bad Password\r\n"
 # define ERR_BADMODEL(host) host + " :Bad L mode size\r\n"
-# define RPL_PART(user_id, channel, reason) (user_id + " PART #" + channel + " " + (reason.empty() ? "." : reason ) + "\r\n")
 
+# define RPL_PART(user_id, channel, reason) (user_id + " PART #" + channel + " " + (reason.empty() ? "." : reason ) + "\r\n")
 # define RPL_WELCOME(user_id, nick) ":localhost 001 " + nick + " :Welcome to the Internet Relay Network " + user_id + "\r\n"
 # define RPL_QUIT(user_id, reason) user_id + " QUIT :Quit: " + reason + "\r\n"
 # define RPL_UMODEIS(client, mode) ":localhost 221 " + client + " " + mode + "\r\n"
 # define RPL_NOTOPIC(channel) ":localhost 331 " + channel + " :No topic set for " + channel + "\r\n"
 # define RPL_TOPIC(channel, topic)":localhost 332 " + channel + " " + channel + " " + topic + "\r\n"
+# define RPL_TOPICWHOTIME(channel, nick, setat) ("333 " + channel + " " + nick + " " + setat + "\r\n")
 # define RPL_INVITING(channel, nickname) channel + " " + nickname + "\r\n"
 # define RPL_NICK(oclient, uclient, client) (":" + oclient + "!" + uclient + "@localhost NICK " +  client + "\r\n")
 # define RPL_KICK(channel, operator, nickname, reason) ":" + operator + " KICK " + channel + " " + nickname + " " + reason + "\r\n"

@@ -6,7 +6,7 @@
 /*   By: lde-mais <lde-mais@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/19 16:09:38 by lde-mais          #+#    #+#             */
-/*   Updated: 2024/08/19 16:18:57 by lde-mais         ###   ########.fr       */
+/*   Updated: 2024/08/20 16:10:14 by lde-mais         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,22 +21,6 @@ int    searchMode(std::string *tab, std::string search, int size)
     }
     return -1;
 }
-
-// int Server::searchUserChannel(User &user)
-// {
-    
-//     for (std::map<int, User>::iterator ite = usersManage.begin(); ite != usersManage.end(); ite++)
-//     {
-//         if (ite->second.getNickName() == user.getBuf()[1])
-//             return 1;
-//     }
-//     for (std::vector<Channel>::iterator ite = _channelsList.begin(); ite != _channelsList.end(); ite++)
-//     {
-//         if (ite->getName() == user.getBuf()[1])
-//             return 2;
-//     }
-//     return 0;
-// }
 
 void    modeInvis(User &user)
 {
@@ -243,9 +227,3 @@ void    Server::mode(User &user)
         }
     }
 }
-
-/*
-
-— i : Définir/supprimer le canal sur invitation uniquement -- /!\ au i du user != i du canal
-    
-*/

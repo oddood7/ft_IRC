@@ -6,7 +6,7 @@
 /*   By: lde-mais <lde-mais@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/17 14:21:16 by lde-mais          #+#    #+#             */
-/*   Updated: 2024/08/19 16:17:55 by lde-mais         ###   ########.fr       */
+/*   Updated: 2024/08/20 13:37:47 by lde-mais         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@
 # include <cstdlib>
 # include <cstring>
 # include <csignal>
+# include <ctime>
 # include <poll.h>
 # include <vector>
 # include <map>

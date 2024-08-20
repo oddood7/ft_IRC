@@ -6,7 +6,7 @@
 /*   By: lde-mais <lde-mais@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/17 17:54:22 by lde-mais          #+#    #+#             */
-/*   Updated: 2024/06/24 11:20:30 by lde-mais         ###   ########.fr       */
+/*   Updated: 2024/08/20 11:37:21 by lde-mais         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,6 @@
 
 void Server::pass(User &user)
 {
-    std::cerr << "Buffer size: " << user.getBuf().size() << std::endl;
     if (user.getBuf().size() == 1) {
         std::cerr << RED << ERR_NEEDMOREPARAMS(_name, user.getBuf()[0]) << RESET << std::endl;
         return;
