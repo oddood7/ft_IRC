@@ -6,7 +6,7 @@
 /*   By: lde-mais <lde-mais@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/17 14:21:16 by lde-mais          #+#    #+#             */
-/*   Updated: 2024/08/20 13:37:47 by lde-mais         ###   ########.fr       */
+/*   Updated: 2024/08/25 15:21:30 by lde-mais         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -97,7 +97,6 @@ class Server
 		int		searchUserChannel(User &user);
 		void 	deleteChannel(const std::string& channelName);
 		User*		getUserByNickname(const std::string &nickname);
-		std::vector<std::string> split(const std::string &s, const std::string &delimiter);
 		int		is_op(User &user, std::string nickname);
 		int		isInChannel(User &user, std::string channel);
 		void	deleteFromChannel(User &user);

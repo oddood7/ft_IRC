@@ -6,7 +6,7 @@
 /*   By: lde-mais <lde-mais@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/17 14:33:03 by lde-mais          #+#    #+#             */
-/*   Updated: 2024/08/15 12:54:58 by lde-mais         ###   ########.fr       */
+/*   Updated: 2024/08/25 15:21:41 by lde-mais         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,8 +45,10 @@ class User
 		bool _irssi;
 		bool _verified;
 		bool _deco;
+		//bool _usernameSet;
 
 	public:
+	
 		User();
 		User(const User& cpy);
 		~User();
@@ -71,11 +73,11 @@ class User
 		
 		void	setId(int i) {_id = i;};
 		void	setNickName(const std::string &nick) {_nickName = nick;};
-		void	setUserName(const std::string &user) {_userName = user;};
 		void	setPass(const std::string &pass) {_pass = pass;};
 		void	setRpl(const std::string &rpl) {_rpl = rpl;};
 		void	setMode(bool i) {_invisible = i;};
 		void	setVerif();
+		void	setUserName(const std::string &username) {_userName = username;};
 		void	setDeco() {_deco = true;};
 		void	setIrssi() {_irssi = true;};
 		void	setChannel(Channel channel);

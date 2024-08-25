@@ -6,7 +6,7 @@
 /*   By: lde-mais <lde-mais@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 16:10:31 by lde-mais          #+#    #+#             */
-/*   Updated: 2024/08/20 16:10:50 by lde-mais         ###   ########.fr       */
+/*   Updated: 2024/08/25 12:53:43 by lde-mais         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,9 +89,11 @@ void Server::msg(User &user)
 
         if (j < usersManage.size()) {
             ret = RPL_PRIV(user.getNickName(), target, message);
+			std::cout << "Sending private message: " << ret << std::endl;
             send(usersManage[j].getSocket(), ret.c_str(), ret.size(), 0);
         } else {
             ret = ERR_NOSUCHNICK(target);
+			std::cout << "Sending private message: " << ret << std::endl;
             send(user.getSocket(), ret.c_str(), ret.size(), 0);
         }
     }

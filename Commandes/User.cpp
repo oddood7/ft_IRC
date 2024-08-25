@@ -6,7 +6,7 @@
 /*   By: lde-mais <lde-mais@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/17 18:15:00 by lde-mais          #+#    #+#             */
-/*   Updated: 2024/08/19 15:25:07 by lde-mais         ###   ########.fr       */
+/*   Updated: 2024/08/25 13:20:50 by lde-mais         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,16 +57,36 @@ void	Server::user(User &user)
 	}
 }
 
-void	Server::userIrssi(User &user, int i)
-{
-	std::string str;
-	for (size_t j = i + 1; user.getBuf()[j] != "localhost" && j < user.getBuf().size(); j++){
-		str += user.getBuf()[j];
-		if (user.getBuf().size() > j){
-			if (user.getBuf()[j + 1] != "localhost")
-				str += " ";
-		}
-	}
-	user.setUserName(str);
-	//user.setRpl("USER command accepted.\n");
+// void	Server::userIrssi(User &user, int i)
+// {
+// 	std::string str;
+// 	for (size_t j = i + 1; user.getBuf()[j] != "localhost" && j < user.getBuf().size(); j++){
+// 		str += user.getBuf()[j];
+// 		if (user.getBuf().size() > j){
+// 			if (user.getBuf()[j + 1] != "localhost")
+// 				str += " ";
+// 		}
+// 	}
+// 	user.setUserName(str);
+// 	//user.setRpl("USER command accepted.\n");
+// }
+
+void Server::userIrssi(User &user, int i)
+{    
+    if (i + 3 >= static_cast<int>(user.getBuf().size())) {
+        std::cerr << RED << "Error: USER command is incomplete" << RESET << std::endl;
+        return;
+    }
+    std::string username = user.getBuf()[i + 1];
+    bool usernameExists = false;
+    for (size_t j = 0; j < usersManage.size(); ++j) {
+        if (usersManage[j].getUserName() == username) {
+            usernameExists = true;
+            break;
+        }
+    }
+    if (usernameExists) {
+        username = user.getNickName();
+    }
+    user.setUserName(username);
 }

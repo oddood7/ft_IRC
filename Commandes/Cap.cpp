@@ -6,7 +6,7 @@
 /*   By: lde-mais <lde-mais@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/17 17:39:45 by lde-mais          #+#    #+#             */
-/*   Updated: 2024/08/20 16:08:03 by lde-mais         ###   ########.fr       */
+/*   Updated: 2024/08/25 15:21:07 by lde-mais         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,16 +39,15 @@ void Server::cap(User &user)
                 userCmd = true;
             }
         }
-
-       	if (passw && nick && userCmd)
-    	{
-        	std::string userIdent = user.getUserName() + "!" + user.getNickName() + "@localhost";
-        	user.setRpl(RPL_WELCOME(userIdent, user.getNickName()));
-        	send(user.getSocket(), user.getRpl().c_str(), user.getRpl().size(), 0);
-        	std::cout << GREEN << "User " << user.getId() << " connected" << RESET << std::endl;
-        	user.setIrssi();
-        	user.setVerif();
-    	}
+		if (passw && nick && userCmd)
+		{
+    		std::string userIdent = user.getUserName() + "!" + user.getNickName() + "@localhost";
+    		user.setRpl(RPL_WELCOME(userIdent, user.getNickName()));
+    		send(user.getSocket(), user.getRpl().c_str(), user.getRpl().size(), 0);
+    		std::cout << GREEN << "User " << user.getId() << " connected as " << user.getUserName() << RESET << std::endl;
+    		user.setIrssi();
+    		user.setVerif();
+		}
         else
         {
             std::cerr << RED << "Failed to fully authenticate user." << RESET << std::endl;
@@ -59,3 +58,5 @@ void Server::cap(User &user)
         std::cerr << RED << ERR_UNKNOWNCOMMAND(user.getBuf()[0]) << RESET << std::endl;
     }
 }
+
+

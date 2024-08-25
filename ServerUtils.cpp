@@ -6,7 +6,7 @@
 /*   By: lde-mais <lde-mais@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/17 14:17:19 by lde-mais          #+#    #+#             */
-/*   Updated: 2024/08/20 16:00:08 by lde-mais         ###   ########.fr       */
+/*   Updated: 2024/08/25 14:59:38 by lde-mais         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,6 +46,7 @@ void	Server::useCommand(User &user)
 	else
 		std::cerr << RED << ERR_UNKNOWNCOMMAND(user.getBuf()[0]) << RESET << std::endl;
 }
+
 
 void	Server::deleteFromChannel(User &user)
 {

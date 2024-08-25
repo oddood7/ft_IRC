@@ -6,7 +6,7 @@
 /*   By: lde-mais <lde-mais@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/17 14:38:16 by lde-mais          #+#    #+#             */
-/*   Updated: 2024/08/20 13:39:03 by lde-mais         ###   ########.fr       */
+/*   Updated: 2024/08/25 12:43:51 by lde-mais         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,7 +58,7 @@
 # define RPL_INVITING(channel, nickname) channel + " " + nickname + "\r\n"
 # define RPL_NICK(oclient, uclient, client) (":" + oclient + "!" + uclient + "@localhost NICK " +  client + "\r\n")
 # define RPL_KICK(channel, operator, nickname, reason) ":" + operator + " KICK " + channel + " " + nickname + " " + reason + "\r\n"
-# define RPL_PRIV(nickname, target, message) ":" + nickname + " PRIVMSG "  + target + " " + message + "\r\n"
+# define RPL_PRIV(nickname, target, message) ":" + nickname + "!~" + nickname + "@localhost PRIVMSG " + target + " :" + message + "\r\n"
 # define RPL_NOTICE(nickname, target, message) ":" + nickname + " NOTICE " + target + " " + message + "\r\n"
 # define MODE_USERMSG(client, mode) ":" + client + " MODE " + client + " :" + mode + "\r\n"
 # define MODE_CHANNELMSG(channel, mode) ":" + channel + " MODE " + channel + " :" + mode + "\r\n"
