@@ -6,7 +6,7 @@
 /*   By: lde-mais <lde-mais@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/17 17:39:45 by lde-mais          #+#    #+#             */
-/*   Updated: 2024/08/25 15:21:07 by lde-mais         ###   ########.fr       */
+/*   Updated: 2024/08/25 16:25:23 by lde-mais         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 void Server::cap(User &user)
 {
-    if (!user.getIrssi())
+	if (!user.getIrssi())
     {
         bool passw = false;
         bool nick = false;

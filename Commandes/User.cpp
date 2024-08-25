@@ -6,7 +6,7 @@
 /*   By: lde-mais <lde-mais@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/17 18:15:00 by lde-mais          #+#    #+#             */
-/*   Updated: 2024/08/25 13:20:50 by lde-mais         ###   ########.fr       */
+/*   Updated: 2024/08/25 17:52:56 by lde-mais         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,36 +57,48 @@ void	Server::user(User &user)
 	}
 }
 
-// void	Server::userIrssi(User &user, int i)
-// {
-// 	std::string str;
-// 	for (size_t j = i + 1; user.getBuf()[j] != "localhost" && j < user.getBuf().size(); j++){
-// 		str += user.getBuf()[j];
-// 		if (user.getBuf().size() > j){
-// 			if (user.getBuf()[j + 1] != "localhost")
-// 				str += " ";
-// 		}
-// 	}
-// 	user.setUserName(str);
-// 	//user.setRpl("USER command accepted.\n");
-// }
-
-void Server::userIrssi(User &user, int i)
-{    
-    if (i + 3 >= static_cast<int>(user.getBuf().size())) {
-        std::cerr << RED << "Error: USER command is incomplete" << RESET << std::endl;
-        return;
-    }
-    std::string username = user.getBuf()[i + 1];
-    bool usernameExists = false;
-    for (size_t j = 0; j < usersManage.size(); ++j) {
-        if (usersManage[j].getUserName() == username) {
-            usernameExists = true;
-            break;
-        }
-    }
-    if (usernameExists) {
-        username = user.getNickName();
-    }
-    user.setUserName(username);
+void	Server::userIrssi(User &user, int i)
+{
+	std::string str;
+	for (size_t j = i + 1; user.getBuf()[j] != "localhost" && j < user.getBuf().size(); j++){
+		str += user.getBuf()[j];
+		if (user.getBuf().size() > j){
+			if (user.getBuf()[j + 1] != "localhost")
+				str += " ";
+		}
+	}
+	user.setUserName(str);
+	//user.setRpl("USER command accepted.\n");
 }
+
+// void Server::userIrssi(User &user, int i)
+// {    
+//     // Vérifier que les paramètres sont suffisants
+//     if (i + 3 >= static_cast<int>(user.getBuf().size())) {
+//         std::cerr << RED << "Error: USER command is incomplete" << RESET << std::endl;
+//         return;
+//     }
+
+//     // Extraire le nom d'utilisateur depuis les paramètres
+//     std::string username = user.getBuf()[i + 1];
+
+//     // Vérifier si le nom d'utilisateur existe déjà dans les utilisateurs connectés
+//     bool usernameExists = false;
+//     for (std::map<int, User>::iterator it = usersManage.begin(); it != usersManage.end(); ++it) {
+//         if (it->second.getUserName() == username) {
+//             usernameExists = true;
+//             break;
+//         }
+//     }
+
+//     // Si le nom d'utilisateur existe déjà, utiliser le surnom
+//     if (usernameExists) {
+//         username = user.getNickName();
+//     }
+
+//     // Définir le nom d'utilisateur de l'utilisateur
+//     user.setUserName(username);
+
+//     // Conserver les autres paramètres de la commande USER
+//     // Par exemple, vous pouvez traiter d'autres paramètres si nécessaire ici.
+// }

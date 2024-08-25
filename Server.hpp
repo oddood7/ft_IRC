@@ -6,7 +6,7 @@
 /*   By: lde-mais <lde-mais@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/17 14:21:16 by lde-mais          #+#    #+#             */
-/*   Updated: 2024/08/25 15:21:30 by lde-mais         ###   ########.fr       */
+/*   Updated: 2024/08/25 16:59:45 by lde-mais         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@
 # include <iostream>
 # include <cctype>
 # include <unistd.h>
+# include <algorithm>
 # include <cstdlib>
 # include <cstring>
 # include <csignal>

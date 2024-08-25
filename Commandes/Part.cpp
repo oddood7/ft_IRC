@@ -6,7 +6,7 @@
 /*   By: lde-mais <lde-mais@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 16:11:08 by lde-mais          #+#    #+#             */
-/*   Updated: 2024/08/20 16:11:09 by lde-mais         ###   ########.fr       */
+/*   Updated: 2024/08/25 17:50:18 by lde-mais         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -101,3 +101,12 @@ void Server::part(User &user)
     std::string closeMessage = ":" + _name + " KICK " + channelName + " " + user.getNickName() + " :Left the channel\r\n";
     send(user.getSocket(), closeMessage.c_str(), closeMessage.size(), 0);
 }
+
+
+
+
+
+
+
+
+

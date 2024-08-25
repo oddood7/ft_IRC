@@ -6,7 +6,7 @@
 /*   By: lde-mais <lde-mais@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/17 14:17:19 by lde-mais          #+#    #+#             */
-/*   Updated: 2024/08/25 14:59:38 by lde-mais         ###   ########.fr       */
+/*   Updated: 2024/08/25 17:21:49 by lde-mais         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,6 +89,10 @@ int	Server::isInChannel(User &user, std::string channel)
 
 void	Server::send_all(Channel &channel, std::string rpl, std::string user)
 {
+	if (rpl.empty()) {
+        std::cerr << RED << "Error: Message to send is empty" << RESET << std::endl;
+        return;
+    }
 	for (size_t i = 0; i < channel.getChatters().size(); i++)
 	{
 		for (size_t j = 0; j < usersManage.size(); j++)
