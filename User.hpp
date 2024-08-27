@@ -6,7 +6,7 @@
 /*   By: lde-mais <lde-mais@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/17 14:33:03 by lde-mais          #+#    #+#             */
-/*   Updated: 2024/08/25 15:21:41 by lde-mais         ###   ########.fr       */
+/*   Updated: 2024/08/27 13:20:33 by lde-mais         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,7 @@ class User
 		sockaddr_in _addr;
 
 		std::string _hostName;
+//		std::string _realName;
 		std::string _nickName;
 		std::string _userName;
 		std::string _host;
@@ -73,6 +74,7 @@ class User
 		
 		void	setId(int i) {_id = i;};
 		void	setNickName(const std::string &nick) {_nickName = nick;};
+//		void	setRealName(const std::string &real) {_realName = real;};
 		void	setPass(const std::string &pass) {_pass = pass;};
 		void	setRpl(const std::string &rpl) {_rpl = rpl;};
 		void	setMode(bool i) {_invisible = i;};

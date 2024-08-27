@@ -6,7 +6,7 @@
 /*   By: lde-mais <lde-mais@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 16:10:31 by lde-mais          #+#    #+#             */
-/*   Updated: 2024/08/25 12:53:43 by lde-mais         ###   ########.fr       */
+/*   Updated: 2024/08/27 14:26:07 by lde-mais         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,6 +46,9 @@ void Server::msg(User &user)
             message += " ";
     }
 
+	if (!message.empty() && message[0] == ':')
+        message = message.substr(1);
+		
     if (target[0] == '#' || target[0] == '&') // Message à un canal
     {
         Channel* channel = NULL;

@@ -6,7 +6,7 @@
 /*   By: lde-mais <lde-mais@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/17 14:31:44 by lde-mais          #+#    #+#             */
-/*   Updated: 2024/08/25 17:12:20 by lde-mais         ###   ########.fr       */
+/*   Updated: 2024/08/27 13:01:56 by lde-mais         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,6 +53,7 @@ User & User::operator=(User const & cpy)
 
 void User::setBuf(const std::string buffer)
 {
+	_buf.clear();
     std::istringstream iss(buffer);
     std::string word;
     while (iss >> word)

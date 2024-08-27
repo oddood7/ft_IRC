@@ -6,7 +6,7 @@
 /*   By: lde-mais <lde-mais@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/17 14:14:08 by lde-mais          #+#    #+#             */
-/*   Updated: 2024/08/25 17:56:11 by lde-mais         ###   ########.fr       */
+/*   Updated: 2024/08/27 14:57:32 by lde-mais         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -141,7 +141,7 @@ void	Server::createUser()
 
 void Server::listenUser()
 {
-    static std::map<int, std::string> inputBuffers;
+    static std::map<int, std::string> partialCommands;
 
     for (int i = 1; i <= _activeUsers; i++)
     {
@@ -152,43 +152,44 @@ void Server::listenUser()
             if (bytesRead > 0)
             {
                 buffer[bytesRead] = '\0';
-                inputBuffers[_fds[i].fd] += buffer;
+                partialCommands[_fds[i].fd] += buffer;
 
-                // Vérifier si la commande est complète (présence d'un '\n')
-                size_t newlinePos = inputBuffers[_fds[i].fd].find('\n');
-                if (newlinePos != std::string::npos)
+                size_t pos;
+                while ((pos = partialCommands[_fds[i].fd].find('\n')) != std::string::npos)
                 {
-                    std::string completeCommand = inputBuffers[_fds[i].fd].substr(0, newlinePos);
-                    inputBuffers[_fds[i].fd] = inputBuffers[_fds[i].fd].substr(newlinePos + 1);
+                    std::string command = partialCommands[_fds[i].fd].substr(0, pos);
+                    partialCommands[_fds[i].fd] = partialCommands[_fds[i].fd].substr(pos + 1);
 
-                    std::cout << "Received from user " << usersManage[_fds[i].fd].getNickName() << ": " << completeCommand << std::endl;
-                    usersManage[_fds[i].fd].setBuf(completeCommand);
+                    usersManage[_fds[i].fd].setBuf(command);
                     useCommand(usersManage[_fds[i].fd]);
                     usersManage[_fds[i].fd].getBuf().clear();
                 }
             }
             else if (bytesRead == 0)
             {
-                // La connexion a été fermée, traiter les données restantes s'il y en a
-                if (!inputBuffers[_fds[i].fd].empty())
+                // Gérer CTRL-D ou déconnexion
+                if (!partialCommands[_fds[i].fd].empty())
                 {
-                    std::cout << "Received final data from user " << usersManage[_fds[i].fd].getNickName() << ": " << inputBuffers[_fds[i].fd] << std::endl;
-                    usersManage[_fds[i].fd].setBuf(inputBuffers[_fds[i].fd]);
+                    usersManage[_fds[i].fd].setBuf(partialCommands[_fds[i].fd]);
                     useCommand(usersManage[_fds[i].fd]);
                     usersManage[_fds[i].fd].getBuf().clear();
                 }
                 deleteFromChannel(usersManage[_fds[i].fd]);
                 deleteUser(usersManage[_fds[i].fd]);
-                inputBuffers.erase(_fds[i].fd);
+                partialCommands.erase(_fds[i].fd);
                 i--;
             }
             else
             {
-                std::cerr << "Error receiving data from user " << usersManage[_fds[i].fd].getNickName() << std::endl;
+                deleteFromChannel(usersManage[_fds[i].fd]);
+                deleteUser(usersManage[_fds[i].fd]);
+                partialCommands.erase(_fds[i].fd);
+                i--;
             }
         }
     }
 }
+
 
 // void	Server::deleteUser(User &user)
 // {
