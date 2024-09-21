@@ -6,7 +6,7 @@
 /*   By: lde-mais <lde-mais@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/17 14:17:19 by lde-mais          #+#    #+#             */
-/*   Updated: 2024/09/21 11:23:58 by lde-mais         ###   ########.fr       */
+/*   Updated: 2024/09/21 14:00:04 by lde-mais         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,6 @@ Channel &Server::getUserChannel(std::string channel)
 
 void	Server::useCommand(User &user)
 {
-	std::cout << "RENTRE ICI" << std::endl;
 	std::map<std::string, CommandFunction> ::iterator it = _commandFunctions.find(ft_toupper(user.getBuf()[0]));
 	if (it != _commandFunctions.end())
 		(this->*(it->second))(user);

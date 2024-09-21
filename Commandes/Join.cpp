@@ -6,7 +6,7 @@
 /*   By: lde-mais <lde-mais@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/17 17:53:00 by lde-mais          #+#    #+#             */
-/*   Updated: 2024/09/21 13:07:50 by lde-mais         ###   ########.fr       */
+/*   Updated: 2024/09/21 13:54:13 by lde-mais         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -198,6 +198,7 @@ void Server::join(User& user)
             channelName = channelName.substr(0, 32);
         _channelsList.push_back(Channel(channelName, user.getNickName()));
         channel = &_channelsList[_channelsList.size() - 1];
+		channel->setI(false);
         _activeChannels++;
         newChannel = true;
     }
@@ -256,6 +257,6 @@ void Server::join(User& user)
 
     // Si c'est un nouveau canal, nous ne définissons plus l'utilisateur comme opérateur automatiquement
     if (newChannel) {
-        // Vous pouvez ajouter ici d'autres initialisations pour un nouveau canal si nécessaire
-    }
+         // Vous pouvez ajouter ici d'autres initialisations pour un nouveau canal si nécessaire
+     }
 }
