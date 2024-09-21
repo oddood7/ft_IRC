@@ -6,7 +6,7 @@
 /*   By: lde-mais <lde-mais@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/17 18:15:00 by lde-mais          #+#    #+#             */
-/*   Updated: 2024/09/21 12:54:13 by lde-mais         ###   ########.fr       */
+/*   Updated: 2024/09/21 13:21:17 by lde-mais         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,36 +80,53 @@
 void Server::user(User &user)
 {
     if (user.getBuf().size() < 5) {
-        std::cerr << RED << ERR_NEEDMOREPARAMS(_name, "USER") << RESET << std::endl;
+        std::string err = ERR_NEEDMOREPARAMS(_name, "USER");
+        send(user.getSocket(), err.c_str(), err.size(), 0);
         return;
     }
-
-    if (user.getUserName().empty() == false) {
-        std::cerr << RED << ERR_ALREADYREGISTRED(_name) << RESET << std::endl;
+    if (!user.getUserName().empty()) {
+        std::string err = ERR_ALREADYREGISTRED(_name);
+        send(user.getSocket(), err.c_str(), err.size(), 0);
         return;
     }
-
     std::string username = user.getBuf()[1];
+    std::string hostname = user.getBuf()[2];
     std::string realname = user.getBuf()[4];
+    
+    // Ajouter les parties restantes du realname s'il contient des espaces
     for (size_t i = 5; i < user.getBuf().size(); ++i) {
         realname += " " + user.getBuf()[i];
     }
 
-    for (size_t i = 0; i < username.size(); i++) {
-        if (!isalnum(username[i])) {
-            std::cerr << RED << ERR_ERRONEUSUSER(_name, username) << RESET << std::endl;
-            return;
+    // Vérifier si le nom d'utilisateur est déjà utilisé
+    std::string baseUsername = username;
+    int suffix = 1;
+    bool isUnique = false;
+
+    while (!isUnique) {
+        isUnique = true;
+        for (std::map<int, User>::iterator it = usersManage.begin(); it != usersManage.end(); ++it) {
+            if (it->second.getUserName() == username) {
+                isUnique = false;
+                std::stringstream ss;
+                ss << baseUsername << suffix;
+                username = ss.str();
+                suffix++;
+                break;
+            }
         }
     }
 
     user.setUserName(username);
+    user.setHostName(hostname);
     user.setRealName(realname);
-    std::cout << GREEN << "User" << user.getId() << " registered username: " << username << RESET << std::endl;
+
+    std::cout << GREEN << "User" << user.getId() << " registered as " << username << RESET << std::endl;
 
     if (!user.getNickName().empty() && !user.getPass().empty()) {
-        std::string userIdent = user.getUserName() + "!" + user.getNickName() + "@localhost";
-        user.setRpl(RPL_WELCOME(userIdent, user.getNickName()));
-        send(user.getSocket(), user.getRpl().c_str(), user.getRpl().size(), 0);
+        std::string userIdent = user_id(user.getUserName(), user.getNickName());
+        std::string rpl = RPL_WELCOME(userIdent, user.getNickName());
+        send(user.getSocket(), rpl.c_str(), rpl.size(), 0);
         user.setVerif();
     }
 }
