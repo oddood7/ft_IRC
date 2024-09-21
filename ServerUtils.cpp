@@ -6,7 +6,7 @@
 /*   By: lde-mais <lde-mais@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/17 14:17:19 by lde-mais          #+#    #+#             */
-/*   Updated: 2024/08/27 14:54:21 by lde-mais         ###   ########.fr       */
+/*   Updated: 2024/09/21 11:23:58 by lde-mais         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,12 +40,34 @@ Channel &Server::getUserChannel(std::string channel)
 
 void	Server::useCommand(User &user)
 {
+	std::cout << "RENTRE ICI" << std::endl;
 	std::map<std::string, CommandFunction> ::iterator it = _commandFunctions.find(ft_toupper(user.getBuf()[0]));
 	if (it != _commandFunctions.end())
 		(this->*(it->second))(user);
 	else
 		std::cerr << RED << ERR_UNKNOWNCOMMAND(user.getBuf()[0]) << RESET << std::endl;
 }
+
+// void Server::useCommand(User &user)
+// {
+//     if (user.getBuf().empty())
+//     {
+//         return;
+//     }
+
+//     std::string command = ft_toupper(user.getBuf()[0]);
+//     std::map<std::string, CommandFunction>::iterator it = _commandFunctions.find(command);
+    
+//     if (it != _commandFunctions.end())
+//     {
+//         (this->*(it->second))(user);
+//     }
+//     else
+//     {
+//         std::string err = ERR_UNKNOWNCOMMAND(command);
+//         send(user.getSocket(), err.c_str(), err.size(), 0);
+//     }
+// }
 
 
 void	Server::deleteFromChannel(User &user)
@@ -80,6 +102,7 @@ int	Server::isInChannel(User &user, std::string channel)
 {
 	if (channel != user.getChannel())
 	{
+		std::cout << "try";
 		std::string err = ERR_NOTONCHANNEL(channel);
 		send(user.getSocket(), err.c_str(), err.size(), 0);
 		return 1;

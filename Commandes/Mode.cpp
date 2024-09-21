@@ -6,7 +6,7 @@
 /*   By: lde-mais <lde-mais@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/19 16:09:38 by lde-mais          #+#    #+#             */
-/*   Updated: 2024/08/20 16:10:14 by lde-mais         ###   ########.fr       */
+/*   Updated: 2024/09/21 11:11:17 by lde-mais         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -188,12 +188,12 @@ void    Server::mode(User &user)
         modeInvis(user);
     if (search == 2)
     {
-        int i;
-        for (size_t ite = 0; ite < _channelsList.size(); ite++)
-        {
-            if (_channelsList[ite].getName() == user.getBuf()[1])
-                i = ite;
-        }
+        //int i;
+        // for (size_t ite = 0; ite < _channelsList.size(); ite++)
+        // {
+        //     if (_channelsList[ite].getName() == user.getBuf()[1])
+        //         i = ite;
+        // }
         if (isInChannel(user, user.getBuf()[1])) {
             std::string err = ERR_NOTONCHANNEL(getUserChannel(user.getChannel()).getName());
             send(user.getSocket(), err.c_str(), err.size(), 0);

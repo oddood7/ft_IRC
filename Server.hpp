@@ -6,7 +6,7 @@
 /*   By: lde-mais <lde-mais@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/17 14:21:16 by lde-mais          #+#    #+#             */
-/*   Updated: 2024/08/25 16:59:45 by lde-mais         ###   ########.fr       */
+/*   Updated: 2024/09/21 10:43:31 by lde-mais         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,6 +52,7 @@ class Server
 
 		typedef void (Server::*CommandFunction)(User&);
 		std::map<std::string, CommandFunction> _commandFunctions;
+		std::map<int, std::string> _partialCommands;
 		std::map<int, User> usersManage;
 		std::vector<Channel> _channelsList;
 
@@ -104,6 +105,7 @@ class Server
 		Channel &getUserChannel(std::string channel);
 		void	send_all(Channel &channel, std::string rpl, std::string user);
 		static void 	SignalHandler(int sig);
+		void 	processCommands(User &user, std::string &buffer);
 
 
 };

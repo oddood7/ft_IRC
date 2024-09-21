@@ -6,7 +6,7 @@
 /*   By: lde-mais <lde-mais@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/17 14:31:44 by lde-mais          #+#    #+#             */
-/*   Updated: 2024/08/27 13:01:56 by lde-mais         ###   ########.fr       */
+/*   Updated: 2024/09/21 11:08:01 by lde-mais         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,4 +73,15 @@ void User::setChannel(Channel channel) {
 	else {
         _activeChannel = channel.getName();
     }
+}
+
+void User::appendPartialCommand(const std::string& partial) {
+        _partialCommand += partial;
+}
+
+std::string User::getAndClearPartialCommand()
+{
+    std::string temp = _partialCommand;
+    _partialCommand.clear();
+    return temp;
 }

@@ -6,7 +6,7 @@
 /*   By: lde-mais <lde-mais@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/17 14:33:03 by lde-mais          #+#    #+#             */
-/*   Updated: 2024/08/27 13:20:33 by lde-mais         ###   ########.fr       */
+/*   Updated: 2024/09/21 11:22:57 by lde-mais         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,12 +31,13 @@ class User
 		sockaddr_in _addr;
 
 		std::string _hostName;
-//		std::string _realName;
+		std::string _realName;
 		std::string _nickName;
 		std::string _userName;
 		std::string _host;
 		std::string _pass;
 		std::string _rpl;
+		std::string _partialCommand;
 
 		std::vector<std::string>	_buf;
 
@@ -57,6 +58,8 @@ class User
 
 		User & operator=(User const & cpy);
 
+		void 		appendPartialCommand(const std::string& partial);
+		std::string getAndClearPartialCommand();
 		int			getSocket()  const {return _socket;};
 		int			getId()  const {return _id;};
 		std::string	getNickName() const {return _nickName;};
@@ -71,10 +74,11 @@ class User
 		bool		getDeco() const {return _deco;};
 		std::string		&getChannel() {return _activeChannel;};
 		std::vector<std::string>	&getBuf() {return _buf;};
+		//const std::vector<std::string>& getBuf() const {return _buf;};
 		
 		void	setId(int i) {_id = i;};
 		void	setNickName(const std::string &nick) {_nickName = nick;};
-//		void	setRealName(const std::string &real) {_realName = real;};
+		void	setRealName(const std::string &real) {_realName = real;};
 		void	setPass(const std::string &pass) {_pass = pass;};
 		void	setRpl(const std::string &rpl) {_rpl = rpl;};
 		void	setMode(bool i) {_invisible = i;};

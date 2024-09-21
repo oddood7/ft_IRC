@@ -6,12 +6,30 @@
 /*   By: lde-mais <lde-mais@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/17 17:53:00 by lde-mais          #+#    #+#             */
-/*   Updated: 2024/08/20 16:09:13 by lde-mais         ###   ########.fr       */
+/*   Updated: 2024/09/17 16:53:23 by lde-mais         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../Server.hpp"
 #include "../Channel.hpp"
+
+void debugPrintChannelUsers(Channel& channel) {
+    std::cout << "=== Debug: Channel " << channel.getName() << " ===" << std::endl;
+    
+    std::cout << "Invited users:" << std::endl;
+    const std::vector<std::string>& invitedUsers = channel.getInvite();
+    for (std::vector<std::string>::const_iterator it = invitedUsers.begin(); it != invitedUsers.end(); ++it) {
+        std::cout << "  - " << *it << std::endl;
+    }
+    
+    std::cout << "Chatters:" << std::endl;
+    const std::vector<std::string>& chatters = channel.getChatters();
+    for (std::vector<std::string>::const_iterator it = chatters.begin(); it != chatters.end(); ++it) {
+        std::cout << "  - " << *it << std::endl;
+    }
+    
+    std::cout << "===============================" << std::endl;
+}
 
 int		check_chanpswd(User &user, Channel &channel)
 {
@@ -38,14 +56,17 @@ void	joinChannel(User &user, Channel &channel)
 	}
 	if (channel.getI() == true)
 	{
+		std::cout << "dans join" << std::endl;
 		size_t i;
 		for	(i = 0; i < channel.getInvite().size(); i++)
 		{
 			if (user.getNickName() == channel.getInvite()[i]) {
 				break ;
 			}
+			std::cout << "dans for" << std::endl;
 		}
 		if (i == channel.getInvite().size()) {
+			std::cout << "a la fin" << std::endl;
 			std::string err = ERR_INVITEONLYCHAN(channel.getName());
 			send(user.getSocket(), err.c_str(), err.size(), 0);
 			return ;
@@ -69,6 +90,9 @@ void	joinChannel(User &user, Channel &channel)
 
 void Server::join(User& user)
 {
+	std::cout << "\n=== JOIN command received ===" << std::endl;
+    std::cout << "User: " << user.getNickName() << std::endl;
+    std::cout << "Buffer size: " << user.getBuf().size() << std::endl;
     if (user.getBuf().size() == 1)
     {
         std::string err = ERR_NEEDMOREPARAMS(_name, user.getBuf()[0]);
@@ -79,34 +103,50 @@ void Server::join(User& user)
     std::string channelName = user.getBuf()[1];
     std::string password = (user.getBuf().size() > 2) ? user.getBuf()[2] : "";
 
-    if (channelName[0] != '#' && channelName[0] != '&' && channelName[0] != '1')
+	std::cout << "Channel name: " << channelName << std::endl;
+    std::cout << "Password provided: " << (password.empty() ? "No" : "Yes") << std::endl;
+    if (channelName[0] != '#' && channelName[0] != '&' && channelName[0] != '1') {
         channelName.insert(0, "#");
+		std::cout << "Added # to channel name. New name: " << channelName << std::endl;
+	}
 
     if (channelName.find(',') != std::string::npos || channelName.find(' ') != std::string::npos){
         std::cerr << RED << (channelName) << RESET << std::endl;
         return;
     }
+	std::cout << "Searching for channel: " << channelName << std::endl;
+    std::cout << "Number of active channels: " << _activeChannels << std::endl;
     Channel* channel = NULL;
     for (int i = 0; i < _activeChannels; i++)
     {
+		std::cout << "Checking channel: " << _channelsList[i].getName() << std::endl;
         if (channelName == _channelsList[i].getName())
         {
+			std::cout << "Channel found: " << channelName << std::endl;
             channel = &_channelsList[i];
             break;
         }
+		if (channel == NULL) {
+			std::cout << "Channel not found: " << channelName << std::endl;
+		}
     }
 
     if (channel)
     {
+		std::cout << "Before JOIN:" << std::endl;
+        debugPrintChannelUsers(*channel);
         if (user.getBuf().size() > 3) {
             std::string err = ERR_BADCHANNELKEY(channel->getName());
             send(user.getSocket(), err.c_str(), err.size(), 0);
             return;
         }
         joinChannel(user, *channel);
+		std::cout << "after JOIN:" << std::endl;
+        debugPrintChannelUsers(*channel);
     }
     else
     {
+		std::cout << "Channel does not exist. Creating new channel." << std::endl;
         if (user.getBuf().size() > 3) {
             std::string err = ERR_BADPASS(_name);
             send(user.getSocket(), err.c_str(), err.size(), 0);
@@ -116,8 +156,11 @@ void Server::join(User& user)
             channelName = channelName.substr(0, 32);
         _channelsList.push_back(Channel(channelName, user.getNickName()));
         _activeChannels++;
+		std::cout << "New channel created. Active channels: " << _activeChannels << std::endl;
         joinChannel(user, _channelsList[_channelsList.size() - 1]);
     }
     std::string joinMessage = ":" + user.getNickName() + "!" + user.getUserName() + "@" + user.getHost() + " JOIN " + channelName + "\r\n";
     send(user.getSocket(), joinMessage.c_str(), joinMessage.size(), 0);
+	std::cout << "Join message sent: " << joinMessage << std::endl;
+    std::cout << "=== END OF JOIN command ===" << std::endl;
 }

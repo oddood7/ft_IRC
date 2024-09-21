@@ -6,7 +6,7 @@
 /*   By: lde-mais <lde-mais@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/17 14:14:08 by lde-mais          #+#    #+#             */
-/*   Updated: 2024/08/27 14:57:32 by lde-mais         ###   ########.fr       */
+/*   Updated: 2024/09/21 11:40:22 by lde-mais         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -113,36 +113,8 @@ void	Server::createUser()
 	}
 }
 
-// void Server::listenUser()
-// {
-//     for (int i = 1; i <= _activeUsers; i++)
-//     {
-//         if (_fds[i].revents & POLLIN)
-//         {
-//             char buffer[1024];
-//             int bytesRead = recv(_fds[i].fd, buffer, sizeof(buffer) - 1, 0);
-//             if (bytesRead > 0)
-//             {
-//                 buffer[bytesRead] = '\0';
-//                 std::cout << "Received from user " << usersManage[_fds[i].fd].getNickName() << ": " << buffer << std::endl;
-//                 usersManage[_fds[i].fd].setBuf(buffer);
-//                 useCommand(usersManage[_fds[i].fd]);
-//                 usersManage[_fds[i].fd].getBuf().clear();
-//             }
-//             else
-//             {
-//                 deleteFromChannel(usersManage[_fds[i].fd]);
-//                 deleteUser(usersManage[_fds[i].fd]);
-//                 i--;
-//             }
-//         }
-//     }
-// }
-
 void Server::listenUser()
 {
-    static std::map<int, std::string> partialCommands;
-
     for (int i = 1; i <= _activeUsers; i++)
     {
         if (_fds[i].revents & POLLIN)
@@ -152,43 +124,174 @@ void Server::listenUser()
             if (bytesRead > 0)
             {
                 buffer[bytesRead] = '\0';
-                partialCommands[_fds[i].fd] += buffer;
-
-                size_t pos;
-                while ((pos = partialCommands[_fds[i].fd].find('\n')) != std::string::npos)
-                {
-                    std::string command = partialCommands[_fds[i].fd].substr(0, pos);
-                    partialCommands[_fds[i].fd] = partialCommands[_fds[i].fd].substr(pos + 1);
-
-                    usersManage[_fds[i].fd].setBuf(command);
-                    useCommand(usersManage[_fds[i].fd]);
-                    usersManage[_fds[i].fd].getBuf().clear();
-                }
-            }
-            else if (bytesRead == 0)
-            {
-                // Gérer CTRL-D ou déconnexion
-                if (!partialCommands[_fds[i].fd].empty())
-                {
-                    usersManage[_fds[i].fd].setBuf(partialCommands[_fds[i].fd]);
-                    useCommand(usersManage[_fds[i].fd]);
-                    usersManage[_fds[i].fd].getBuf().clear();
-                }
-                deleteFromChannel(usersManage[_fds[i].fd]);
-                deleteUser(usersManage[_fds[i].fd]);
-                partialCommands.erase(_fds[i].fd);
-                i--;
+                std::cout << "Received from user " << usersManage[_fds[i].fd].getNickName() << ": " << buffer << std::endl;
+                usersManage[_fds[i].fd].setBuf(buffer);
+                useCommand(usersManage[_fds[i].fd]);
+                usersManage[_fds[i].fd].getBuf().clear();
             }
             else
             {
                 deleteFromChannel(usersManage[_fds[i].fd]);
                 deleteUser(usersManage[_fds[i].fd]);
-                partialCommands.erase(_fds[i].fd);
                 i--;
             }
         }
     }
 }
+
+// void Server::listenUser()
+// {
+//     // Cette map stocke les commandes partielles de chaque utilisateur.
+//     static std::map<int, std::string> partialCommands;
+
+//     for (int i = 1; i <= _activeUsers; i++)
+//     {
+//         if (_fds[i].revents & POLLIN)
+//         {
+//             char buffer[1024];
+//             int bytesRead = recv(_fds[i].fd, buffer, sizeof(buffer) - 1, 0);
+//             if (bytesRead > 0)
+//             {
+//                 buffer[bytesRead] = '\0';  // Terminer le buffer par '\0'
+//                 partialCommands[_fds[i].fd] += buffer;  // Ajouter la nouvelle partie reçue au buffer existant
+
+//                 // Processer les commandes complètes trouvées dans le buffer
+//                 std::string::size_type pos;
+//                 while ((pos = partialCommands[_fds[i].fd].find('\n')) != std::string::npos)
+//                 {
+//                     // Extraire la commande jusqu'au '\n'
+//                     std::string command = partialCommands[_fds[i].fd].substr(0, pos);
+//                     partialCommands[_fds[i].fd] = partialCommands[_fds[i].fd].substr(pos + 1);
+
+//                     // Nettoyage manuel des retours chariot `\r`
+//                     for (std::string::iterator it = command.begin(); it != command.end(); ++it)
+//                     {
+//                         if (*it == '\r')
+//                         {
+//                             command.erase(it);  // Supprimer les '\r'
+//                             break;  // Ne faire qu'une seule fois par commande
+//                         }
+//                     }
+
+//                     // Exécuter la commande complète
+//                     usersManage[_fds[i].fd].setBuf(command);
+//                     useCommand(usersManage[_fds[i].fd]);
+//                     usersManage[_fds[i].fd].getBuf().clear();
+//                 }
+//             }
+//             else if (bytesRead == 0)  // Gestion de la déconnexion avec ou sans données restantes
+//             {
+//                 if (!partialCommands[_fds[i].fd].empty())
+//                 {
+//                     // Si des données restent dans le buffer, les traiter comme une commande finale
+//                     usersManage[_fds[i].fd].setBuf(partialCommands[_fds[i].fd]);
+//                     useCommand(usersManage[_fds[i].fd]);
+//                     usersManage[_fds[i].fd].getBuf().clear();
+//                 }
+//                 // Supprimer l'utilisateur et nettoyer le buffer partiel
+//                 deleteFromChannel(usersManage[_fds[i].fd]);
+//                 deleteUser(usersManage[_fds[i].fd]);
+//                 partialCommands.erase(_fds[i].fd);
+//                 i--;  // Réduire l'indice pour éviter de sauter un utilisateur
+//             }
+//             else  // Gestion des erreurs
+//             {
+//                 deleteFromChannel(usersManage[_fds[i].fd]);
+//                 deleteUser(usersManage[_fds[i].fd]);
+//                 partialCommands.erase(_fds[i].fd);
+//                 i--;  // Réduire l'indice ici aussi
+//             }
+//         }
+//     }
+// }
+
+
+// void Server::processCommands(User &user, std::string &buffer)
+// {
+//     std::string::size_type pos;
+//     while ((pos = buffer.find('\n')) != std::string::npos)
+//     {
+//         std::string line = buffer.substr(0, pos);
+//         buffer.erase(0, pos + 1);
+
+//         // Supprimer les retours chariot
+//         line.erase(std::remove(line.begin(), line.end(), '\r'), line.end());
+
+//         // Passer la ligne complète à setBuf
+//         user.setBuf(line);
+
+//         if (!user.getBuf().empty())
+//         {
+//             std::string command = ft_toupper(user.getBuf()[0]);
+            
+//             if (command == "CAP" || command == "PASS" || command == "NICK" || command == "USER")
+//             {
+//                 useCommand(user);
+//             }
+//             else if (user.getVerif())
+//             {
+//                 useCommand(user);
+//             }
+//             else
+//             {
+//                 std::string err = ERR_NOTREGISTERED(_name);
+//                 send(user.getSocket(), err.c_str(), err.size(), 0);
+//             }
+//         }
+//     }
+// }
+
+
+// void Server::listenUser()
+// {
+//     static std::map<int, std::string> partialCommands;
+
+//     for (int i = 1; i <= _activeUsers; i++)
+//     {
+//         if (_fds[i].revents & POLLIN)
+//         {
+//             char buffer[1024];
+//             int bytesRead = recv(_fds[i].fd, buffer, sizeof(buffer) - 1, 0);
+//             if (bytesRead > 0)
+//             {
+//                 buffer[bytesRead] = '\0';
+//                 partialCommands[_fds[i].fd] += buffer;
+
+//                 size_t pos;
+//                 while ((pos = partialCommands[_fds[i].fd].find('\n')) != std::string::npos)
+//                 {
+//                     std::string command = partialCommands[_fds[i].fd].substr(0, pos);
+//                     partialCommands[_fds[i].fd] = partialCommands[_fds[i].fd].substr(pos + 1);
+
+//                     usersManage[_fds[i].fd].setBuf(command);
+//                     useCommand(usersManage[_fds[i].fd]);
+//                     usersManage[_fds[i].fd].getBuf().clear();
+//                 }
+//             }
+//             else if (bytesRead == 0)
+//             {
+//                 // Gérer CTRL-D ou déconnexion
+//                 if (!partialCommands[_fds[i].fd].empty())
+//                 {
+//                     usersManage[_fds[i].fd].setBuf(partialCommands[_fds[i].fd]);
+//                     useCommand(usersManage[_fds[i].fd]);
+//                     usersManage[_fds[i].fd].getBuf().clear();
+//                 }
+//                 deleteFromChannel(usersManage[_fds[i].fd]);
+//                 deleteUser(usersManage[_fds[i].fd]);
+//                 partialCommands.erase(_fds[i].fd);
+//                 i--;
+//             }
+//             else
+//             {
+//                 deleteFromChannel(usersManage[_fds[i].fd]);
+//                 deleteUser(usersManage[_fds[i].fd]);
+//                 partialCommands.erase(_fds[i].fd);
+//                 i--;
+//             }
+//         }
+//     }
+// }
 
 
 // void	Server::deleteUser(User &user)

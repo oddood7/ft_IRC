@@ -16,7 +16,7 @@ SRCS = main.cpp Server.cpp User.cpp Channel.cpp ServerUtils.cpp \
 
 OBJS = $(SRCS:.cpp=.o)
 
-CXX = c++
+CXX = g++
 CXXFLAGS = -Wall -Wextra -Werror -std=c++98
 
 all: $(NAME)
