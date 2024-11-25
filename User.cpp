@@ -6,14 +6,14 @@
 /*   By: lde-mais <lde-mais@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/17 14:31:44 by lde-mais          #+#    #+#             */
-/*   Updated: 2024/09/21 11:08:01 by lde-mais         ###   ########.fr       */
+/*   Updated: 2024/11/24 14:18:37 by lde-mais         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "User.hpp"
 #include "Utils.hpp"
 
-User::User() {}
+User::User() : _socket(0), _id(0), _invisible(false), _irssi(false), _verified(false), _deco(false){}
 
 User::~User() {}
 
@@ -60,19 +60,35 @@ void User::setBuf(const std::string buffer)
     {
         _buf.push_back(word);
     }
-}
+}// void	Server::deleteUser(User &user)
+// {
+// 	std::map<int, User>::iterator it = usersManage.find(user.getSocket());
+// 	if (it != usersManage.end())
+// 	{		
+// 		close(user.getSocket());
+// 		std::cout << RED << "User " << user.getId() << " disconnected" << RESET << std::endl;
+// 		usersManage.erase(it);
+// 		_activeUsers--;
+// 	}
+// 	for (int j = user.getId(); j <= _activeUsers; ++j)
+// 		_fds[j] = _fds[j + 1];	
+// }
 
 void	User::setVerif() {
 	_verified = true;
 }
 
-void User::setChannel(Channel channel) {
-    if (channel.getName().empty()) {
-        _activeChannel = "";
+void User::setChannel(Channel &channel)
+{
+    // Si on quitte un channel (channel vide passé)
+    if (channel.getName().empty())
+    {
+        _activeChannel.clear();
+        return;
     }
-	else {
-        _activeChannel = channel.getName();
-    }
+    
+    // Si on rejoint un nouveau channel
+    _activeChannel = channel.getName();
 }
 
 void User::appendPartialCommand(const std::string& partial) {

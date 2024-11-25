@@ -6,7 +6,7 @@
 /*   By: lde-mais <lde-mais@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/17 17:54:22 by lde-mais          #+#    #+#             */
-/*   Updated: 2024/08/20 11:37:21 by lde-mais         ###   ########.fr       */
+/*   Updated: 2024/11/24 13:54:29 by lde-mais         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,13 +27,14 @@ void Server::pass(User &user)
     {
         if (user.getBuf()[1].compare(_password)) {
             std::cerr << RED << ERR_PASSWDMISMATCH(_name) << RESET << std::endl;
-            user.setDeco();
-            deleteUser(user);
+            //user.setDeco();
+            //deleteUser(user);
             return ;
         }
         else {
             std::cerr << "Password accepted." << std::endl;
             user.setPass(user.getBuf()[1]);
+			//user.setVerif();
             return ;
         }
     }
@@ -60,6 +61,7 @@ bool Server::passIrssi(User &user, int i)
         {
             std::cerr << "Password accepted by passIrssi." << std::endl;
             user.setPass(user.getBuf()[i + 1]);
+			//user.setVerif();
         }
     }
     return true;

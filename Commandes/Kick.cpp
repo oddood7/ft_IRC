@@ -6,7 +6,7 @@
 /*   By: lde-mais <lde-mais@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 16:09:56 by lde-mais          #+#    #+#             */
-/*   Updated: 2024/08/20 16:09:57 by lde-mais         ###   ########.fr       */
+/*   Updated: 2024/09/23 15:17:17 by lde-mais         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,48 +21,62 @@ void Server::kick(User &user)
         send(user.getSocket(), err.c_str(), err.size(), 0);
         return;
     }
-    if (searchUserChannel(user) != 2) {
-        err = ERR_NOSUCHCHANNEL(user.getBuf()[1]);
+
+    std::string channelName = user.getBuf()[1];
+    Channel &channel = getUserChannel(channelName);
+
+    if (channel.getName().empty()) {
+        err = ERR_NOSUCHCHANNEL(channelName);
         send(user.getSocket(), err.c_str(), err.size(), 0);
         return;
     }
-    if (isInChannel(user, user.getBuf()[1])) {
-        err = ERR_NOTONCHANNEL(getUserChannel(user.getChannel()).getName());
-        send(user.getSocket(), err.c_str(), err.size(), 0);
+
+    if (isInChannel(user, channelName)) {
         return;
     }
+
     if (is_op(user, user.getNickName()) == -1) {
-        err = ERR_CHANOPRIVSNEEDED(getUserChannel(user.getChannel()).getName());
+        err = ERR_CHANOPRIVSNEEDED(channelName);
         send(user.getSocket(), err.c_str(), err.size(), 0);
         return;
     }
-    for (size_t i = 0; i < getUserChannel(user.getChannel()).getChatters().size(); i++) {
-        if (user.getBuf()[2] == getUserChannel(user.getChannel()).getChatters()[i]) {
-            std::string channelName = getUserChannel(user.getChannel()).getName();
-            std::string kickedNick = user.getBuf()[2];
-            
-            err = RPL_KICK(channelName, user.getNickName(), kickedNick, user.getBuf()[3]);
-            
-            std::string partMsg = RPL_PART(user_id(user.getUserName(), user.getNickName()), channelName, user.getBuf()[3]);
-            
-            for (size_t k = 0; k < getUserChannel(user.getChannel()).getChatters().size(); k++) {
-                for (size_t j = 0; j < usersManage.size(); j++) {
-                    if (getUserChannel(user.getChannel()).getChatters()[k] == usersManage[j].getNickName()) {
-                        send(usersManage[j].getSocket(), err.c_str(), err.size(), 0);
-                        send(usersManage[j].getSocket(), partMsg.c_str(), partMsg.size(), 0);
-                        break;
-                    }
-                }
-            }
-            for (size_t j = 0; j < usersManage.size(); j++) {
-                if (kickedNick == usersManage[j].getNickName()) {
-                    usersManage[j].getChannel().clear();
-                    break;
-                }
-            }
-            
-            getUserChannel(user.getChannel()).getChatters().erase(getUserChannel(user.getChannel()).getChatters().begin() + i);
-            i--;
+
+    std::string kickedNick = user.getBuf()[2];
+    std::string reason = user.getBuf().size() > 3 ? user.getBuf()[3] : "No reason specified";
+    
+    bool userFound = false;
+    for (size_t i = 0; i < channel.getChatters().size(); ++i) {
+        if (kickedNick == channel.getChatters()[i]) {
+            userFound = true;
+            break;
+        }
+    }
+
+    if (!userFound) {
+        err = ERR_USERNOTINCHANNEL(kickedNick, channelName);
+        send(user.getSocket(), err.c_str(), err.size(), 0);
+        return;
+    }
+
+    std::string kickMsg = ":" + user.getNickName() + "!" + user.getUserName() + "@" + user.getHost() + 
+                          " KICK " + channelName + " " + kickedNick + " :" + reason + "\r\n";
+
+    for (size_t i = 0; i < channel.getChatters().size(); ++i) {
+        User* chatUser = getUserByNickname(channel.getChatters()[i]);
+        if (chatUser) {
+            send(chatUser->getSocket(), kickMsg.c_str(), kickMsg.size(), 0);
+        }
+    }
+
+    User* kickedUser = getUserByNickname(kickedNick);
+    if (kickedUser) {
+        kickedUser->getChannel().clear();
+    }
+    
+    for (std::vector<std::string>::iterator it = channel.getChatters().begin(); it != channel.getChatters().end(); ++it) {
+        if (*it == kickedNick) {
+            channel.getChatters().erase(it);
+            break;
         }
     }
 }

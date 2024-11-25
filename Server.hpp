@@ -6,7 +6,7 @@
 /*   By: lde-mais <lde-mais@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/17 14:21:16 by lde-mais          #+#    #+#             */
-/*   Updated: 2024/09/21 10:43:31 by lde-mais         ###   ########.fr       */
+/*   Updated: 2024/11/24 15:15:44 by lde-mais         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -102,10 +102,12 @@ class Server
 		int		is_op(User &user, std::string nickname);
 		int		isInChannel(User &user, std::string channel);
 		void	deleteFromChannel(User &user);
-		Channel &getUserChannel(std::string channel);
+		Channel &getUserChannel(const std::string& channelName);
 		void	send_all(Channel &channel, std::string rpl, std::string user);
 		static void 	SignalHandler(int sig);
 		void 	processCommands(User &user, std::string &buffer);
+		bool 	isUserInChannel(const std::string& nickname, const std::string& channelName);
+		void	who(User &user);
 
 
 };

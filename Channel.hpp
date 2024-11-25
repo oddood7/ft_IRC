@@ -6,7 +6,7 @@
 /*   By: lde-mais <lde-mais@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/17 14:37:00 by lde-mais          #+#    #+#             */
-/*   Updated: 2024/09/21 13:32:23 by lde-mais         ###   ########.fr       */
+/*   Updated: 2024/11/24 14:18:44 by lde-mais         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 
 # include <vector>
 # include <string>
+# include <algorithm>
 
 class Channel
 {
@@ -59,6 +60,32 @@ class Channel
 		void	setI(bool boo) {_i = boo;};
 		void	setT(bool boo) {_t = boo;};
 		void	setL(size_t i) {_l = i;};
+
+		void removeChatter(const std::string& nickname) {
+        std::vector<std::string>::iterator it = std::find(_chatters.begin(), _chatters.end(), nickname);
+        if (it != _chatters.end())
+            _chatters.erase(it);
+    	}
+
+    	void removeOperator(const std::string& nickname) {
+        	std::vector<std::string>::iterator it = std::find(_operator.begin(), _operator.end(), nickname);
+        	if (it != _operator.end())
+            _operator.erase(it);
+    	}
+
+    	void removeInvite(const std::string& nickname) {
+        	std::vector<std::string>::iterator it = std::find(_invite.begin(), _invite.end(), nickname);
+        	if (it != _invite.end())
+            _invite.erase(it);
+    	}
+
+    	bool isChatter(const std::string& nickname) const {
+        	return std::find(_chatters.begin(), _chatters.end(), nickname) != _chatters.end();
+    	}
+
+    	bool isOperator(const std::string& nickname) const {
+        	return std::find(_operator.begin(), _operator.end(), nickname) != _operator.end();
+    	}
 };
 
 #endif

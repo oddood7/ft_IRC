@@ -6,7 +6,7 @@
 /*   By: lde-mais <lde-mais@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/17 14:37:31 by lde-mais          #+#    #+#             */
-/*   Updated: 2024/08/13 14:22:20 by lde-mais         ###   ########.fr       */
+/*   Updated: 2024/09/23 15:19:21 by lde-mais         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,9 +18,11 @@ int main(int ac, char **av)
 	{
         try {
             Server server(std::atoi(av[1]), av[2]);
-			signal(SIGINT, Server::SignalHandler); //-> catch the signal (ctrl + c)
-  			signal(SIGQUIT, Server::SignalHandler); //-> catch the signal (ctrl + \)
+			signal(SIGINT, Server::SignalHandler);
+  			signal(SIGQUIT, Server::SignalHandler);
             server.run();
+			signal(SIGINT, Server::SignalHandler); 
+  			signal(SIGQUIT, Server::SignalHandler); 
         }
         catch (std::exception &e) {
         }

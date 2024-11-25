@@ -6,7 +6,7 @@
 /*   By: lde-mais <lde-mais@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/17 14:14:08 by lde-mais          #+#    #+#             */
-/*   Updated: 2024/09/21 12:49:16 by lde-mais         ###   ########.fr       */
+/*   Updated: 2024/11/24 15:42:43 by lde-mais         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -113,135 +113,6 @@ void	Server::createUser()
 	}
 }
 
-// void Server::listenUser()
-// {
-//     for (int i = 1; i <= _activeUsers; i++)
-//     {
-//         if (_fds[i].revents & POLLIN)
-//         {
-//             char buffer[1024];
-//             int bytesRead = recv(_fds[i].fd, buffer, sizeof(buffer) - 1, 0);
-//             if (bytesRead > 0)
-//             {
-//                 buffer[bytesRead] = '\0';
-//                 std::cout << "Received from user " << usersManage[_fds[i].fd].getNickName() << ": " << buffer << std::endl;
-//                 usersManage[_fds[i].fd].setBuf(buffer);
-//                 useCommand(usersManage[_fds[i].fd]);
-//                 usersManage[_fds[i].fd].getBuf().clear();
-//             }
-//             else
-//             {
-//                 deleteFromChannel(usersManage[_fds[i].fd]);
-//                 deleteUser(usersManage[_fds[i].fd]);
-//                 i--;
-//             }
-//         }
-//     }
-// }
-
-// void Server::listenUser()
-// {
-//     // Cette map stocke les commandes partielles de chaque utilisateur.
-//     static std::map<int, std::string> partialCommands;
-
-//     for (int i = 1; i <= _activeUsers; i++)
-//     {
-//         if (_fds[i].revents & POLLIN)
-//         {
-//             char buffer[1024];
-//             int bytesRead = recv(_fds[i].fd, buffer, sizeof(buffer) - 1, 0);
-//             if (bytesRead > 0)
-//             {
-//                 buffer[bytesRead] = '\0';  // Terminer le buffer par '\0'
-//                 partialCommands[_fds[i].fd] += buffer;  // Ajouter la nouvelle partie reçue au buffer existant
-
-//                 // Processer les commandes complètes trouvées dans le buffer
-//                 std::string::size_type pos;
-//                 while ((pos = partialCommands[_fds[i].fd].find('\n')) != std::string::npos)
-//                 {
-//                     // Extraire la commande jusqu'au '\n'
-//                     std::string command = partialCommands[_fds[i].fd].substr(0, pos);
-//                     partialCommands[_fds[i].fd] = partialCommands[_fds[i].fd].substr(pos + 1);
-
-//                     // Nettoyage manuel des retours chariot `\r`
-//                     for (std::string::iterator it = command.begin(); it != command.end(); ++it)
-//                     {
-//                         if (*it == '\r')
-//                         {
-//                             command.erase(it);  // Supprimer les '\r'
-//                             break;  // Ne faire qu'une seule fois par commande
-//                         }
-//                     }
-
-//                     // Exécuter la commande complète
-//                     usersManage[_fds[i].fd].setBuf(command);
-//                     useCommand(usersManage[_fds[i].fd]);
-//                     usersManage[_fds[i].fd].getBuf().clear();
-//                 }
-//             }
-//             else if (bytesRead == 0)  // Gestion de la déconnexion avec ou sans données restantes
-//             {
-//                 if (!partialCommands[_fds[i].fd].empty())
-//                 {
-//                     // Si des données restent dans le buffer, les traiter comme une commande finale
-//                     usersManage[_fds[i].fd].setBuf(partialCommands[_fds[i].fd]);
-//                     useCommand(usersManage[_fds[i].fd]);
-//                     usersManage[_fds[i].fd].getBuf().clear();
-//                 }
-//                 // Supprimer l'utilisateur et nettoyer le buffer partiel
-//                 deleteFromChannel(usersManage[_fds[i].fd]);
-//                 deleteUser(usersManage[_fds[i].fd]);
-//                 partialCommands.erase(_fds[i].fd);
-//                 i--;  // Réduire l'indice pour éviter de sauter un utilisateur
-//             }
-//             else  // Gestion des erreurs
-//             {
-//                 deleteFromChannel(usersManage[_fds[i].fd]);
-//                 deleteUser(usersManage[_fds[i].fd]);
-//                 partialCommands.erase(_fds[i].fd);
-//                 i--;  // Réduire l'indice ici aussi
-//             }
-//         }
-//     }
-// }
-
-
-// void Server::processCommands(User &user, std::string &buffer)
-// {
-//     std::string::size_type pos;
-//     while ((pos = buffer.find('\n')) != std::string::npos)
-//     {
-//         std::string line = buffer.substr(0, pos);
-//         buffer.erase(0, pos + 1);
-
-//         // Supprimer les retours chariot
-//         line.erase(std::remove(line.begin(), line.end(), '\r'), line.end());
-
-//         // Passer la ligne complète à setBuf
-//         user.setBuf(line);
-
-//         if (!user.getBuf().empty())
-//         {
-//             std::string command = ft_toupper(user.getBuf()[0]);
-            
-//             if (command == "CAP" || command == "PASS" || command == "NICK" || command == "USER")
-//             {
-//                 useCommand(user);
-//             }
-//             else if (user.getVerif())
-//             {
-//                 useCommand(user);
-//             }
-//             else
-//             {
-//                 std::string err = ERR_NOTREGISTERED(_name);
-//                 send(user.getSocket(), err.c_str(), err.size(), 0);
-//             }
-//         }
-//     }
-// }
-
-
 void Server::listenUser()
 {
     static std::map<int, std::string> partialCommands;
@@ -255,6 +126,7 @@ void Server::listenUser()
             if (bytesRead > 0)
             {
                 buffer[bytesRead] = '\0';
+				std::cout << "Auto command received from user " << i << ": " << buffer;
                 partialCommands[_fds[i].fd] += buffer;
 
                 size_t pos;
@@ -263,6 +135,8 @@ void Server::listenUser()
                     std::string command = partialCommands[_fds[i].fd].substr(0, pos);
                     partialCommands[_fds[i].fd] = partialCommands[_fds[i].fd].substr(pos + 1);
 
+					std::cout << "Processing command: " << command << std::endl;
+					
                     usersManage[_fds[i].fd].setBuf(command);
                     useCommand(usersManage[_fds[i].fd]);
                     usersManage[_fds[i].fd].getBuf().clear();
@@ -270,7 +144,6 @@ void Server::listenUser()
             }
             else if (bytesRead == 0)
             {
-                // Gérer CTRL-D ou déconnexion
                 if (!partialCommands[_fds[i].fd].empty())
                 {
                     usersManage[_fds[i].fd].setBuf(partialCommands[_fds[i].fd]);
@@ -293,34 +166,119 @@ void Server::listenUser()
     }
 }
 
-
-// void	Server::deleteUser(User &user)
+// void Server::deleteUser(User &user)
 // {
-// 	std::map<int, User>::iterator it = usersManage.find(user.getSocket());
-// 	if (it != usersManage.end())
-// 	{		
-// 		close(user.getSocket());
-// 		std::cout << RED << "User " << user.getId() << " disconnected" << RESET << std::endl;
-// 		usersManage.erase(it);
-// 		_activeUsers--;
-// 	}
-// 	for (int j = user.getId(); j <= _activeUsers; ++j)
-// 		_fds[j] = _fds[j + 1];	
+//     std::map<int, User>::iterator it = usersManage.find(user.getSocket());
+//     if (it != usersManage.end())
+//     {
+//         int userSocket = user.getSocket();
+//         close(userSocket);
+//         for (int j = user.getId(); j <= _activeUsers; ++j)
+//             _fds[j] = _fds[j + 1];
+
+//         _activeUsers--;
+//     	std::cout << RED << "User " << user.getId() << " disconnected" << RESET << std::endl;
+//         usersManage.erase(it);
+//     }
+// }
+
+// void Server::deleteUser(User &user)
+// {
+//     std::string nickname = user.getNickName();
+    
+//     // Nettoyage de tous les canaux d'abord
+//     for (size_t i = 0; i < _channelsList.size();) {
+//         _channelsList[i].removeChatter(nickname);
+//         _channelsList[i].removeOperator(nickname);
+//         _channelsList[i].removeInvite(nickname);
+        
+//         // Si le canal est vide après le retrait de l'utilisateur
+//         if (_channelsList[i].getChatters().empty()) {
+//             // Si c'était le dernier canal
+//             if (_activeChannels > 0)
+//                 _activeChannels--;
+            
+//             // Supprimer le canal
+//             _channelsList.erase(_channelsList.begin() + i);
+//         }
+//         else {
+//             // Si le propriétaire du canal part, transférer la propriété au premier opérateur restant
+//             if (_channelsList[i].getOwner() == nickname && !_channelsList[i].getOperator().empty()) {
+//                 _channelsList[i].setOwner(_channelsList[i].getOperator()[0]);
+//             }
+//             ++i;
+//         }
+//     }
+
+//     // Supprimer l'utilisateur
+//     std::map<int, User>::iterator it = usersManage.find(user.getSocket());
+//     if (it != usersManage.end()) {
+//         int userSocket = user.getSocket();
+//         close(userSocket);
+        
+//         // Mettre à jour les descripteurs de fichiers
+//         for (int j = user.getId(); j <= _activeUsers; ++j) {
+//             _fds[j] = _fds[j + 1];
+//         }
+
+//         _activeUsers--;
+//         std::cout << RED << "User " << user.getId() << " disconnected" << RESET << std::endl;
+//         usersManage.erase(it);
+//     }
 // }
 
 void Server::deleteUser(User &user)
 {
-    std::map<int, User>::iterator it = usersManage.find(user.getSocket());
-    if (it != usersManage.end())
-    {
-        int userSocket = user.getSocket();
-        close(userSocket);
-        for (int j = user.getId(); j <= _activeUsers; ++j)
-            _fds[j] = _fds[j + 1];
-
-        _activeUsers--;
-    	std::cout << RED << "User " << user.getId() << " disconnected" << RESET << std::endl;
-        usersManage.erase(it);
+    int userSocket = user.getSocket();
+    int userId = user.getId();
+    std::string userNick = user.getNickName();
+    std::string userName = user.getUserName();
+    std::string userHost = user.getHost();
+    
+    std::map<int, User>::iterator it = usersManage.find(userSocket);
+    if (it == usersManage.end()) {
+        return;
     }
-}
 
+    for (size_t i = 0; i < _channelsList.size(); ++i) {
+        std::vector<std::string>& chatters = _channelsList[i].getChatters();
+        
+        for (size_t j = 0; j < chatters.size(); ++j) {
+            if (chatters[j] == userNick) {
+                std::string quitMsg = ":" + userNick + "!" + userName + "@" + userHost + 
+                                    " QUIT :Connection closed\r\n";
+                
+                for (size_t k = 0; k < chatters.size(); ++k) {
+                    if (chatters[k] != userNick) {
+                        User* otherUser = getUserByNickname(chatters[k]);
+                        if (otherUser && otherUser->getSocket() != userSocket) {
+                            send(otherUser->getSocket(), quitMsg.c_str(), quitMsg.size(), 0);
+                        }
+                    }
+                }
+                
+                chatters.erase(chatters.begin() + j);
+                break;
+            }
+        }
+        
+        if (_channelsList[i].getChatters().empty()) {
+            _channelsList.erase(_channelsList.begin() + i);
+            if (_activeChannels > 0)
+                _activeChannels--;
+            i--;
+        }
+    }
+
+    close(userSocket);
+
+    for (int j = userId; j <= _activeUsers; ++j) {
+        _fds[j] = _fds[j + 1];
+    }
+
+    if (_activeUsers > 0)
+        _activeUsers--;
+    
+    std::cout << RED << "User disconnected" << RESET << std::endl;
+    usersManage.erase(it);
+}

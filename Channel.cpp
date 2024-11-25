@@ -6,7 +6,7 @@
 /*   By: lde-mais <lde-mais@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/17 14:36:41 by lde-mais          #+#    #+#             */
-/*   Updated: 2024/09/21 13:53:33 by lde-mais         ###   ########.fr       */
+/*   Updated: 2024/11/24 14:18:45 by lde-mais         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@ Channel::Channel(const Channel& cpy) : _name(cpy._name), _topic(cpy._topic), _ow
 Channel::~Channel() {
 }
 
-Channel &Channel::operator=(Channel const & cpy) {
+Channel &Channel::operator=(const Channel& cpy) {
 	if (this != &cpy) {
 		this->_name = cpy._name;
 		this->_topic = cpy._topic;

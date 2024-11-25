@@ -6,7 +6,7 @@
 /*   By: lde-mais <lde-mais@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/17 14:38:16 by lde-mais          #+#    #+#             */
-/*   Updated: 2024/09/21 10:48:44 by lde-mais         ###   ########.fr       */
+/*   Updated: 2024/09/23 15:21:47 by lde-mais         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,6 @@
 #define ERR_UNKNOWNCOMMAND(command) (std::string(":localhost 421 ") + command + " :Unknown command\r\n")
 # define ERR_NOSUCHNICK(nick) ":localhost 401 " + nick + " :No such nick/channel\r\n"
 # define ERR_NOSUCHCHANNEL(channel) ":localhost 403 " + channel + " :No such channel\r\n"
-//# define ERR_UNKNOWNCOMMAND(command) ":localhost 421 " + command + " :Unknown command\r\n"
 # define ERR_NONICKNAMEGIVEN(host) host + " 431 :No nick name given\r\n"
 # define ERR_ERRONEUSNICKNAME(host, nickname) host + " 432 " + nickname + " :Erroneus nickname\r\n"
 # define ERR_NICKNAMEINUSE(host, nickname) host + " 433 " + nickname + " :Nickname is already in use\r\n"

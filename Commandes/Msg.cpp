@@ -6,7 +6,7 @@
 /*   By: lde-mais <lde-mais@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 16:10:31 by lde-mais          #+#    #+#             */
-/*   Updated: 2024/08/27 14:26:07 by lde-mais         ###   ########.fr       */
+/*   Updated: 2024/09/23 15:17:55 by lde-mais         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,7 @@ void Server::msg(User &user)
 	if (!message.empty() && message[0] == ':')
         message = message.substr(1);
 		
-    if (target[0] == '#' || target[0] == '&') // Message à un canal
+    if (target[0] == '#' || target[0] == '&')
     {
         Channel* channel = NULL;
         for (size_t i = 0; i < _channelsList.size(); i++) {
@@ -82,7 +82,7 @@ void Server::msg(User &user)
         ret = RPL_PRIV(user.getNickName(), target, message);
         send_all(*channel, ret, user.getNickName());
     }
-    else // Message privé à un utilisateur
+    else 
     {
         size_t j;
         for (j = 0; j < usersManage.size(); j++) {
